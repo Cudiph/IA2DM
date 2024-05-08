@@ -40,9 +40,9 @@ export async function getWSConn() {
   storageCache.set({ progressColor, progressOutlineColor });
   const uri = `ws${cfg.secure ? 's' : ''}://${cfg.host}:${cfg.port}/jsonrpc`;
   wsConn = new WebSocket(uri);
-  wsConn.addEventListener("close", () => {
+  wsConn.addEventListener('close', () => {
     wsConn = null;
-  })
+  });
   return wsConn;
 }
 

@@ -9,6 +9,7 @@ const dl = browser.downloads;
 let wsConn = null;
 let intervalID = null;
 let holdCompleteIcon = false;
+let badgeTimeoutID = null;
 
 browser.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason == 'install') {
@@ -303,10 +304,19 @@ browser.runtime.onMessage.addListener(async (data, _) => {
 });
 
 browser.commands.onCommand.addListener(async (cmd) => {
-  // TODO: add indicator
   if (cmd === 'toggle-intercept') {
     let { intercept } = await browser.storage.local.get('intercept');
     intercept = !intercept;
-    browser.storage.local.set({ intercept });
+    browser.storage.local.set({ intercept }).then(() => {
+      const badgeText = intercept ? 'ON' : 'OFF';
+      const badgeColor = intercept ? '#a5d0e6' : '#f08e97';
+      browser.action.setBadgeBackgroundColor({ color: badgeColor });
+      browser.action.setBadgeText({ text: badgeText });
+
+      if (badgeTimeoutID) clearTimeout(badgeTimeoutID);
+      badgeTimeoutID = setTimeout(() => {
+        browser.action.setBadgeText({ text: '' });
+      }, 3000);
+    });
   }
 });

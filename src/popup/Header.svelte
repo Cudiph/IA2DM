@@ -66,7 +66,9 @@
         class="circle circle-small"
         style="background-color: var(--color-{ws ? 'complete' : 'error'})"
       ></div>
-      <span style="font-size: 14px;" title={ws && cfg.name}>{ws ? 'Connected' : 'Disconnected'}</span>
+      <span style="font-size: 14px;" title={ws && cfg.name}
+        >{ws ? 'Connected' : 'Disconnected'}</span
+      >
     </div>
   </div>
   <div class="misc-action flex">
