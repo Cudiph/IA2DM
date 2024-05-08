@@ -1,0 +1,14 @@
+{
+  "shortName": {
+    "message": "Integrated Aria2",
+    "description": "Short name of the extension"
+  },
+  "extName": {
+    "message": "Integrated Aria2 Download Manager",
+    "description": "Name of the extension."
+  },
+  "extDesc": {
+    "message": "Integrating aria2 into the browser made easy",
+    "description": "Description of the extension."
+  }
+}

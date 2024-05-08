@@ -1,0 +1,14 @@
+{
+  "shortName": {
+    "message": "Integrated Aria2",
+    "description": "Nama pendek dari ekstensi"
+  },
+  "extName": {
+    "message": "Aria2 Download Manager Terintegrasi",
+    "description": "Nama dari ekstensi"
+  },
+  "extDesc": {
+    "message": "Mengintegrasikan aria2 ke dalam browser menjadi sangat mudah",
+    "description": "Deskripsi dari ekstensi"
+  }
+}
