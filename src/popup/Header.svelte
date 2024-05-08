@@ -26,7 +26,8 @@
   }
 
   async function clearHistory() {
-    // TODO: also purge aria2?
+    const aria2json = getAria2JSON(cfg);
+    wsConn.send(aria2json.purgeDownloadResult());
     browser.storage.local.set({ dlHistory: [] });
   }
 
@@ -34,21 +35,28 @@
     intercept = !intercept;
     browser.storage.local.set({ intercept });
   }
+
+  const ADD_TITLE = 'Add new download';
+  const CLEAR_ALL_TITLE = 'Clear download history and purge download result from aria2 memory';
+  const PAUSE_ALL_TITLE = 'Pause all active downloads';
+  const RESUME_ALL_TITLE = 'Resume all paused downloads';
+  const SETTINGS_TITLE = 'Open extension settings';
+  const TOGGLE_TITLE = 'Toggle intercept downloads';
 </script>
 
 <header>
   <div class="dl-action flex">
-    <button on:click={() => ($page = 'add')}>
+    <button on:click={() => ($page = 'add')} title={ADD_TITLE}>
       <img class="img-icon" src={addIcon} alt="Add new download" />
     </button>
     <div class="separator"></div>
-    <button on:click={resumeAll}>
+    <button on:click={resumeAll} title={RESUME_ALL_TITLE}>
       <img class="img-icon" src={resumeIcon} alt="Resume all" />
     </button>
-    <button on:click={pauseAll}>
+    <button on:click={pauseAll} title={PAUSE_ALL_TITLE}>
       <img class="img-icon" src={pauseIcon} alt="Pause all" />
     </button>
-    <button on:click={clearHistory}>
+    <button on:click={clearHistory} title={CLEAR_ALL_TITLE}>
       <img class="img-icon" src={trashIcon} alt="Clear history" />
     </button>
   </div>
@@ -58,14 +66,14 @@
         class="circle circle-small"
         style="background-color: var(--color-{ws ? 'complete' : 'error'})"
       ></div>
-      <span style="font-size: 14px;">{ws ? 'Connected' : 'Disconnected'}</span>
+      <span style="font-size: 14px;" title={ws && cfg.name}>{ws ? 'Connected' : 'Disconnected'}</span>
     </div>
   </div>
   <div class="misc-action flex">
-    <button on:click={() => browser.runtime.openOptionsPage()}>
+    <button on:click={() => browser.runtime.openOptionsPage()} title={SETTINGS_TITLE}>
       <img class="img-icon" src={settingsIcon} alt="Settings" />
     </button>
-    <button class="toggle-button" on:click={handleToggleIntercept}>
+    <button class="toggle-button" on:click={handleToggleIntercept} title={TOGGLE_TITLE}>
       <div class="toggle" class:toggle-enabled={intercept} class:toggle-disabled={!intercept}>
         <div class="circle"></div>
       </div>
