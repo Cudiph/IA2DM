@@ -68,6 +68,13 @@
   }
 
   async function saveConfiguration() {
+    const trimList = ['name', 'host', 'saveDir'];
+    for (let i = 0; i < $RPCs.length; i++) {
+      for (const key of trimList) {
+        $RPCs[i][key] = $RPCs[i][key].trim();
+      }
+    }
+
     try {
       await browser.storage.local.set({
         intercept,
