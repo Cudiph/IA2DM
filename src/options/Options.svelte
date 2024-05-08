@@ -8,8 +8,8 @@
   let intercept = false;
   let sendCookies = false;
   let sendReferer = false;
-  let progressColor;
-  let progressOutlineColor;
+  let progressColor = '';
+  let progressOutlineColor = '';
   let timer = null;
   let errorMsg = '';
   /** @type {HTMLDivElement} */
@@ -98,6 +98,11 @@
       }
       timer = null;
     }, 4000);
+  }
+
+  $: {
+    progressColor = progressColor.trim();
+    progressOutlineColor = progressOutlineColor.trim();
   }
 </script>
 
