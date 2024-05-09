@@ -3,6 +3,7 @@
   import pauseIcon from '../assets/pause.svg';
   import clearIcon from '../assets/delete-outline.svg';
   import xIcon from '../assets/close.svg';
+  import stopIcon from '../assets/stop.svg';
   import { wsConn, cfg, selectedItem, page, storageCache } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDefaultIcon } from '../lib/graphics';
@@ -70,7 +71,6 @@
   }
 </script>
 
-<!-- TODO: Bittorrent -->
 <div class="container">
   <div class="icon">
     <img src={item.icon || getDefaultIcon()} alt="icon" />
@@ -94,13 +94,15 @@
       </div>
     {/if}
     <div class="etc">
-      <!-- TODO: show seeding status -->
-      {#if item.status !== 'active'}
+      <!-- TODO: split seeder to its own block -->
+      {#if item.seeder}
+        <span style="color: var(--color-complete); font-weight: 500;">Seeding</span>
+      {:else if item.status !== 'active'}
         <span style="color: var(--color-{item.status}); font-weight: 500;"
           >{capitalize(item.status)}</span
         >
       {/if}
-      {#if item.status === 'active'}
+      {#if item.status === 'active' && !item.seeder}
         <span
           >{bestTimeString(calculateETA(item.dlSpeed, item.completedLength, item.filesize))} left</span
         >
@@ -109,13 +111,15 @@
         <!-- <span>—</span> -->
         <span>-</span>
       {/if}
-      {#if item.completedLength && item.status !== 'complete'}
+      {#if item.completedLength && item.status !== 'complete' && !item.seeder}
         <span>{bestBytesString(item.completedLength, { comparison: item.filesize })} /</span>
       {/if}
       {#if item.filesize > 0}
         <span>{bestBytesString(item.filesize)}</span>
       {/if}
-      <!-- TODO: bittorrent, upload speed -->
+      {#if item.uploadSpeed && item.seeder}
+        <span>({bestBytesString(item.uploadSpeed)}/sec)</span>
+      {/if}
       {#if item.dlSpeed && item.status === 'active'}
         <span>({bestBytesString(item.dlSpeed)}/sec)</span>
       {/if}
@@ -135,9 +139,8 @@
       </button>
     {/if}
     {#if item.status === 'paused' || item.status === 'active'}
-      <!-- TODO: stop icon when bittorrent is seeding -->
       <button on:click={handleRemoveClick}>
-        <img class="img-icon" src={xIcon} alt="delete" />
+        <img class="img-icon" src={item.seeder ? stopIcon : xIcon} alt="delete" />
       </button>
     {:else}
       <button on:click={handleClearClick}>

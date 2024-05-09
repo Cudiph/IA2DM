@@ -91,19 +91,23 @@
         }
         const theUri = item.files[0]?.uris[0]?.uri;
         const saved = activeDownload[item.gid];
+        /** @type {DownloadItem} */
         const downloadItemStruct = {
           gid: item.gid,
-          url: saved?.url || theUri || '',
           icon: saved?.icon || '',
           dirname,
           basename: basename || theUri || 'Unknown filename',
-          dlSpeed: parseInt(item.downloadSpeed),
-          completedLength: parseInt(item.completedLength),
-          filesize: parseInt(item.totalLength),
           status: item.status,
+          seeder: item.seeder === "true" ? true : false,
+          uploadSpeed: parseInt(item.uploadSpeed),
+          dlSpeed: parseInt(item.downloadSpeed),
+          connections: parseInt(item.connections),
+          completedLength: parseInt(item.completedLength),
+          uploadLength: parseInt(item.uploadLength),
+          url: saved?.url || theUri || '',
+          filesize: parseInt(item.totalLength),
           serverName: saved?.serverName || '',
           startTime: saved?.startTime,
-          finishTime: 0,
           errorMsg: item.errorMessage,
         };
 

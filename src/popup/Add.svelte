@@ -28,7 +28,6 @@
     }
 
     try {
-      // TODO: Add to active download list
       await browser.runtime.sendMessage({ type: 'poke' });
       const res = await aria2.addUri([input], cfg.options);
       const resjson = await res.json();
