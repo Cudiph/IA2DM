@@ -68,7 +68,7 @@
   }
 
   async function saveConfiguration() {
-    const trimList = ['name', 'host', 'saveDir'];
+    const trimList = ['name', 'host'];
     for (let i = 0; i < $RPCs.length; i++) {
       for (const key of trimList) {
         $RPCs[i][key] = $RPCs[i][key].trim();
@@ -192,7 +192,7 @@
 </main>
 
 <style>
-  .yapping {
+  main {
     max-width: 900px;
   }
 

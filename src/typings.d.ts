@@ -3,7 +3,7 @@
 type aria2_status = 'active' | 'waiting' | 'paused' | 'error' | 'complete' | 'removed';
 
 type option_t = {
-  [key: string]: string | string[];
+  [key: string]: string;
 };
 
 // using gid as the key
@@ -15,7 +15,6 @@ interface RPCConfig {
   name: string;
   host: string;
   port: number;
-  saveDir?: string;
   secret?: string;
   secure?: boolean;
   options?: option_t;
@@ -41,6 +40,7 @@ interface DownloadItem {
   startTime?: number;
   finishTime?: number;
   errorMsg?: string;
+  seeder?: boolean;
   cookie?: string; // unused, need more consideration
 }
 

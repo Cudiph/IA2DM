@@ -43,7 +43,6 @@ export function resetConfig() {
         name: 'Main Instance',
         host: '127.0.0.1',
         port: 6800,
-        saveDir: '',
         secret: '',
         secure: false,
         options: {},
