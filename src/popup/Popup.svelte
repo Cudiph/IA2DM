@@ -50,9 +50,14 @@
         'status',
         'totalLength',
         'completedLength',
+        'uploadLength',
         'downloadSpeed',
+        'uploadSpeed',
         'files',
         'dir',
+        'seeder',
+        'connections',
+        'errorMessage',
       ];
       ws.send(`[${aria2json.tellActive(props)}, ${aria2json.tellWaiting(0, 9999, props)}]`);
     };
@@ -99,6 +104,7 @@
           serverName: saved?.serverName || '',
           startTime: saved?.startTime,
           finishTime: 0,
+          errorMsg: item.errorMessage,
         };
 
         newActiveDownloads.push(downloadItemStruct);

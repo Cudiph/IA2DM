@@ -8,7 +8,7 @@ type option_t = {
 
 // using gid as the key
 type activeDownload_t = {
-  [key: string]: DownloadItem;
+  [key: string]: activeDownloadItem;
 };
 
 interface RPCConfig {
@@ -21,27 +21,39 @@ interface RPCConfig {
   updateDelay?: number;
 }
 
+// properties that can't be fetched with tellStatus
+interface activeDownloadItem {
+  gid?: string;
+  icon?: string;
+  startTime?: number;
+  url?: string;
+  serverName?: string;
+}
+
 interface DownloadItem {
-  // required
+  // common value
   gid: string;
   icon: string;
   dirname: string;
   basename: string;
   status: aria2_status;
 
-  // optional
-  url?: string;
-  bitfield?: string;
+  // active/in progress exclusive
+  seeder?: boolean;
   uploadSpeed?: number;
   dlSpeed?: number;
+  connections?: number;
   completedLength?: number;
+  uploadLength?: number;
+
+  // extra info
+  url?: string;
+  bitfield?: string;
   filesize?: number;
   serverName?: string;
   startTime?: number;
   finishTime?: number;
   errorMsg?: string;
-  seeder?: boolean;
-  cookie?: string; // unused, need more consideration
 }
 
 // structure stored in the root of local browser storage

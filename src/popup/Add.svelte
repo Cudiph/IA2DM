@@ -36,6 +36,15 @@
         throw new Error(resjson.error.message);
       }
       success = true;
+      const gid = resjson.result;
+      const { activeDownload } = await browser.storage.local.get('activeDownload');
+      activeDownload[gid] = {
+        gid,
+        url: input,
+        serverName: cfg.name,
+        startTime: +new Date(),
+      };
+      browser.storage.local.set({ activeDownload });
       setTimeout(() => {
         $page = 'main';
       }, 1000);

@@ -1,7 +1,13 @@
 import browser from 'webextension-polyfill';
 import { getAria2Batch, getAria2JSON, getAria2OOP } from './lib/aria2rpc.js';
 import { gen_checklist_icon, gen_progress_icon, resetActionIcon } from './lib/graphics.js';
-import { check_connection, cookiesStringify, getDirnameBasename, resetConfig } from './lib/util.js';
+import {
+  check_connection,
+  cookiesStringify,
+  getDirnameBasename,
+  getFolderName,
+  resetConfig,
+} from './lib/util.js';
 
 const bslocal = browser.storage.local;
 const dl = browser.downloads;
@@ -53,7 +59,7 @@ browser.downloads.onCreated.addListener(async (item) => {
   connectWebsocket(rpcOnlineCfg);
 
   const [dirname, basename] = await getDirnameBasename(item.filename);
-  if (!rpcOnlineCfg.options.dir) rpcOnlineCfg.options.dir = dirname
+  if (!rpcOnlineCfg.options.dir) rpcOnlineCfg.options.dir = dirname;
   rpcOnlineCfg.options.out = basename;
 
   // forward referer to aria2
@@ -75,7 +81,7 @@ browser.downloads.onCreated.addListener(async (item) => {
     }
   }
 
-  /** @type {DownloadItem} */
+  /** @type {activeDownloadItem} */
   let download_obj;
   try {
     // throw Error("dsfs");;
@@ -86,10 +92,6 @@ browser.downloads.onCreated.addListener(async (item) => {
       gid: resjson.result,
       url: item.url || '',
       icon: icon,
-      dirname: rpcOnlineCfg.options.dir,
-      basename: rpcOnlineCfg.options.out,
-      filesize: item.fileSize,
-      status: 'active',
       serverName: rpcOnlineCfg.name,
       startTime: +new Date(),
     };
@@ -182,10 +184,8 @@ async function moveToDLHistory(cfg, data) {
   const { activeDownload, dlHistory } = await bslocal.get(['activeDownload', 'dlHistory']);
   const aria2 = getAria2OOP(cfg);
   const status = data.method.split('load').pop();
-  let statusValue = 'Unknown';
   switch (status) {
     case 'Stop':
-      statusValue = 'removed';
       break;
     case 'Complete':
       holdCompleteIcon = true;
@@ -193,53 +193,51 @@ async function moveToDLHistory(cfg, data) {
       setTimeout(() => {
         holdCompleteIcon = false;
       }, 3000);
-      statusValue = 'complete';
       break;
     case 'Error':
-      statusValue = 'error';
     default:
       break;
   }
 
   for (const i of data.params) {
-    const item = activeDownload[i.gid];
+    let item = activeDownload[i.gid];
     const res = await aria2.tellStatus(i.gid, [
-      'dir',
-      'files',
-      'completedLength',
+      'status',
       'totalLength',
+      'completedLength',
       'errorMessage',
+      'files',
+      'dir',
     ]);
     const { result } = await res.json();
+    const theUri = result.files[0]?.uris[0]?.uri;
+    console.log(result);
 
-    // handle probably external download or manual download
-    if (!item) {
-      const [dirname, basename] = await getDirnameBasename(result.files[0].path);
-      const theUri = result.files[0]?.uris[0]?.uri;
-      const download_obj = {
-        gid: i.gid,
-        url: theUri || '',
-        icon: '',
-        dirname: dirname || result.dir,
-        basename: basename || theUri || 'Unknown filename',
-        completedLength: parseInt(result?.completedLength),
-        filesize: parseInt(result?.totalLength),
-        status: statusValue,
-        errorMsg: result.errorMessage,
-      };
-
-      dlHistory.unshift(download_obj);
-      continue;
+    let dirname, basename;
+    const folderName = await getFolderName(result.dir, result.files[0]?.path);
+    if (folderName) {
+      dirname = result.dir;
+      basename = folderName;
+    } else {
+      [dirname, basename] = await getDirnameBasename(result.files[0]?.path);
     }
 
-    // fetch the filesize
-    if (statusValue === 'complete') {
-      item.filesize = parseInt(result.completedLength);
-    } else if (statusValue === 'error') {
-      item.errorMsg = result.errorMessage;
-    }
+    // bare minimum property
+    const download_obj = {
+      gid: i.gid,
+      url: theUri || '',
+      icon: '',
+      dirname,
+      basename: basename || theUri || 'Unknown filename',
+      completedLength: parseInt(result.completedLength),
+      filesize: parseInt(result.totalLength),
+      status: result.status,
+      errorMsg: result.errorMessage,
+    };
 
-    item.status = statusValue;
+    // item will be empty if its not handled from this extension
+    item = item ? Object.assign(download_obj, item) : download_obj;
+
     item.finishTime = +new Date();
     dlHistory.unshift(item);
     delete activeDownload[i.gid];
