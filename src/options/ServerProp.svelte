@@ -6,29 +6,47 @@
   /** @type {RPCConfig} */
   export let rpcConfig;
   export let index = 0;
+  let useUserAgent = rpcConfig.options['user-agent'] || false;
+  let saveDir = rpcConfig.options.dir || '';
 
+  let timeoutID = null;
   let test = '';
   let version = '';
-
-  let yaml_option = '';
-
-  for (const key in rpcConfig.options) {
-    yaml_option += `${key}: ${rpcConfig.options[key]}\n`;
+  let optionKey = Object.keys(rpcConfig.options);
+  let optionValue = [];
+  for (const k of optionKey) {
+    optionValue.push(rpcConfig.options[k]);
   }
 
   $: {
-    const lines = yaml_option.split('\n');
-    const as_obj = {};
-    for (const line of lines) {
-      let [key, ...val] = line.split(':');
-      key = key.trim();
-      const theRest = val.join(':').trim();
-      if (!key?.trim() || !theRest?.trim()) continue;
-      as_obj[key] = theRest;
+    if (!optionKey.length) {
+      optionKey = [''];
+      optionValue = [''];
     }
+    rpcConfig.options = {};
+    for (let i = 0; i < optionKey.length; i++) {
+      const key = optionKey[i];
+      const val = optionValue[i];
+      if (!key || !val) continue;
+      rpcConfig.options[key] = val;
+    }
+  }
 
-    // LSP need to chill
-    rpcConfig.options = as_obj;
+  function handleUseUserAgent() {
+    if (!useUserAgent) {
+      tableAssign('user-agent', navigator.userAgent);
+    } else {
+      tableRemove('user-agent');
+    }
+    useUserAgent = !useUserAgent;
+  }
+
+  function handleSaveTo() {
+    if (!saveDir) {
+      tableRemove('dir');
+      return;
+    }
+    tableAssign('dir', saveDir);
   }
 
   function deleteConfig() {
@@ -41,18 +59,77 @@
     try {
       const res = await aria2.getVersion();
       const resjson = await res.json();
+      if (resjson.error) {
+        throw new Error(resjson.error.message);
+      }
       version = resjson.result.version;
       test = 'success';
     } catch (e) {
-      test = 'fail';
+      test = e;
     }
-    setTimeout(() => {
+    if (timeoutID) clearTimeout(timeoutID);
+    timeoutID = setTimeout(() => {
       test = '';
-    }, 4000);
+      timeoutID = null;
+    }, 3000);
+  }
+
+  // option table operation
+  function addNewOption() {
+    optionKey = [...optionKey, ''];
+    optionValue = [...optionValue, ''];
+  }
+
+  function removeByIndex(idx) {
+    optionKey.splice(idx, 1);
+    optionValue.splice(idx, 1);
+    refreshOptionTable();
+  }
+
+  function refreshOptionTable() {
+    optionKey = [...optionKey];
+    optionValue = [...optionValue];
+  }
+
+  /**
+   * @param {any} key
+   * @param {any} value
+   */
+  function tableAssign(key, value) {
+    if (optionKey.length && !optionKey[0] && !optionValue[0]) {
+      optionKey = [];
+      optionValue = [];
+    }
+    for (let i = 0; i < optionKey.length; i++) {
+      const k = optionKey[i];
+      if (k === key) {
+        optionValue[i] = value;
+        refreshOptionTable();
+        return;
+      }
+    }
+
+    optionKey.push(key);
+    optionValue.push(value);
+    refreshOptionTable();
+  }
+
+  /**
+   * @param {any} key
+   */
+  function tableRemove(key) {
+    for (let i = 0; i < optionKey.length; i++) {
+      const k = optionKey[i];
+      if (k === key) {
+        optionKey.splice(i, 1);
+        optionValue.splice(i, 1);
+        refreshOptionTable();
+        return;
+      }
+    }
   }
 </script>
 
-<!-- TODO: make sure the required fields are not empty -->
 <Collapser title={rpcConfig.name + ` #${index + 1}`} hide={!index ? false : true}>
   <label>
     Profile Name:
@@ -70,20 +147,38 @@
     >RPC Secret:
     <input type="password" bind:value={rpcConfig.secret} />
   </label>
-  <label
-    >Save files to:
-    <input type="text" bind:value={rpcConfig.saveDir} />
-  </label>
   <label>
     <input type="checkbox" bind:checked={rpcConfig.secure} />
     Secure
   </label>
 
-  <!-- TODO: custom options need to handled better -->
-  <label>
-    Aria2 Options:
-    <textarea bind:value={yaml_option}></textarea>
+  <span>Quick Options</span>
+  <label
+    >Save files to:
+    <input type="text" bind:value={saveDir} on:input={handleSaveTo} />
   </label>
+
+  <label>
+    <input type="checkbox" bind:checked={useUserAgent} on:click={handleUseUserAgent} />
+    Use browser user agent
+  </label>
+
+  <span>Aria2 Options Table:</span>
+  <table>
+    <tr>
+      <th>Key</th>
+      <th>Value</th>
+      <th></th>
+    </tr>
+    {#each optionKey as k, i}
+      <tr>
+        <td><input type="text" bind:value={k} /></td>
+        <td><input type="text" bind:value={optionValue[i]} /></td>
+        <td><button on:click={() => removeByIndex(i)} class="delete-button">x</button></td>
+      </tr>
+    {/each}
+    <button on:click={addNewOption}>+</button>
+  </table>
 
   <button on:click={testConnection}>Test Connection</button>
   {#if $RPCs.length > 1}
@@ -93,8 +188,8 @@
   <div class="message">
     {#if test === 'success'}
       <p class="success">Connection Successful, Using Aria version {version}</p>
-    {:else if test === 'fail'}
-      <p class="failed">Connection Failed</p>
+    {:else if test !== ''}
+      <p class="failed">Connection Failed {test}</p>
     {/if}
   </div>
 </Collapser>
@@ -108,6 +203,11 @@
   button,
   p {
     margin: 10px;
+  }
+
+  .delete-button {
+    padding: 0 10px;
+    margin: 0;
   }
 
   .message p {

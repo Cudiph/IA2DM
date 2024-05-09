@@ -8,8 +8,8 @@
   let intercept = false;
   let sendCookies = false;
   let sendReferer = false;
-  let progressColor;
-  let progressOutlineColor;
+  let progressColor = '';
+  let progressOutlineColor = '';
   let timer = null;
   let errorMsg = '';
   /** @type {HTMLDivElement} */
@@ -68,6 +68,13 @@
   }
 
   async function saveConfiguration() {
+    const trimList = ['name', 'host'];
+    for (let i = 0; i < $RPCs.length; i++) {
+      for (const key of trimList) {
+        $RPCs[i][key] = $RPCs[i][key].trim();
+      }
+    }
+
     try {
       await browser.storage.local.set({
         intercept,
@@ -91,6 +98,11 @@
       }
       timer = null;
     }, 4000);
+  }
+
+  $: {
+    progressColor = progressColor.trim();
+    progressOutlineColor = progressOutlineColor.trim();
   }
 </script>
 
@@ -180,7 +192,7 @@
 </main>
 
 <style>
-  .yapping {
+  main {
     max-width: 900px;
   }
 

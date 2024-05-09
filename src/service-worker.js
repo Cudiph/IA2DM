@@ -53,13 +53,8 @@ browser.downloads.onCreated.addListener(async (item) => {
   connectWebsocket(rpcOnlineCfg);
 
   const [dirname, basename] = await getDirnameBasename(item.filename);
-  if (rpcOnlineCfg.saveDir.trim()) {
-    rpcOnlineCfg.options.dir = rpcOnlineCfg.saveDir;
-    rpcOnlineCfg.options.out = basename;
-  } else {
-    rpcOnlineCfg.options.dir = dirname;
-    rpcOnlineCfg.options.out = basename;
-  }
+  if (!rpcOnlineCfg.options.dir) rpcOnlineCfg.options.dir = dirname
+  rpcOnlineCfg.options.out = basename;
 
   // forward referer to aria2
   // startwith prevent about:blank to be set
@@ -316,6 +311,7 @@ browser.commands.onCommand.addListener(async (cmd) => {
       if (badgeTimeoutID) clearTimeout(badgeTimeoutID);
       badgeTimeoutID = setTimeout(() => {
         browser.action.setBadgeText({ text: '' });
+        badgeTimeoutID = null;
       }, 3000);
     });
   }
