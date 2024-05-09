@@ -25,7 +25,7 @@
     </tr>
     <tr>
       <td>File location</td>
-      <td>{$selectedItem.dirname}/{$selectedItem.basename}</td>
+      <td>{$selectedItem.dirname ? `${$selectedItem.dirname}/` : ''}{$selectedItem.basename}</td>
     </tr>
     <tr style="color: var(--color-{$selectedItem.status})">
       <td>Status</td>

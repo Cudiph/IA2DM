@@ -86,22 +86,50 @@ export function bestBytesString(bytesize, opts = {}) {
   return `${parseFloat(bytesize.toFixed(2))}${withUnit ? ' ' + units[counter] : ''}`;
 }
 
-/**
- * @param {string} filename
- * @returns {Promise<[string, string]>}
- */
-export async function getDirnameBasename(filename) {
+export async function getOSPathSeparator() {
   let separator = '/';
   if (!os) {
     const platform = await browser.runtime.getPlatformInfo();
     os = platform.os;
     if (os === 'win') separator = '\\';
   }
+
+  return separator;
+}
+
+// TODO: test path on michaelsoft binbows OS
+/**
+ * @param {string} filename
+ * @returns {Promise<[string, string]>}
+ */
+export async function getDirnameBasename(filename) {
+  let separator = await getOSPathSeparator();
   const splitted = filename.split(separator);
   const basename = splitted.pop();
   const dirname = splitted.join(separator);
 
   return [dirname, basename];
+}
+
+/** return empty string if not folder otherwise return the foldername
+ * if root directory of the downloaded file is /home/person/downloads
+ * and the full file path is /home/person/downloads/AnimeBatch/Anime-EPS[1-12].mkv
+ * then it return `AnimeBatch`.
+ * @param {string} rootDir
+ * @param {string} fullFilePath
+ */
+export async function getFolderName(rootDir, fullFilePath) {
+  let separator = await getOSPathSeparator();
+  if (!fullFilePath.startsWith(rootDir)) return '';
+
+  let relativePath = fullFilePath.replace(rootDir, '').split(separator);
+  if (relativePath[0] === '') relativePath = relativePath.slice(1);
+
+  if (relativePath.length > 1) {
+    return relativePath[0];
+  }
+
+  return '';
 }
 
 /**

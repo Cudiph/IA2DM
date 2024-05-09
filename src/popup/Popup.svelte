@@ -5,7 +5,7 @@
   import browser from 'webextension-polyfill';
   import { getWSConn, page, cfg } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
-  import { getDirnameBasename } from '../lib/util';
+  import { getDirnameBasename, getFolderName } from '../lib/util';
   import DownloadDetail from './DownloadDetail.svelte';
 
   let intervalID = null;
@@ -73,11 +73,17 @@
     if (data[0].id !== 'popupIntervalPolling') return;
     let newActiveDownloads = [];
 
-    // TODO: change basename to folder name if downloading folder from torrent
     const { activeDownload } = await browser.storage.local.get('activeDownload');
     for (const res of data) {
       for (const item of res.result) {
-        const [dirname, basename] = await getDirnameBasename(item.files[0].path);
+        const folderName = await getFolderName(item.dir, item.files[0].path);
+        let dirname, basename;
+        if (folderName) {
+          dirname = item.dir;
+          basename = folderName;
+        } else {
+          [dirname, basename] = await getDirnameBasename(item.files[0].path);
+        }
         const theUri = item.files[0]?.uris[0]?.uri;
         const saved = activeDownload[item.gid];
         const downloadItemStruct = {
