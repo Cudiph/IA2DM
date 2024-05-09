@@ -11,22 +11,38 @@
   /** @type {DownloadItem} */
   export let item;
   let hasDetail = item.dlSpeed || item.completedLength || item.filesize || item.uploadSpeed;
+  let lastClick = 0; // unix epoch
+  const patientThreshold = 3000; // ms
+
+  function impatientTest() {
+    const diff = +new Date() - lastClick;
+    if (diff < patientThreshold) return true;
+    return false;
+  }
 
   async function handleResumeClick() {
     const aria2json = getAria2JSON(cfg);
     wsConn.send(aria2json.unpause(item.gid));
   }
 
-  // TODO: force pause on double click or if spammed
   async function handlePauseClick() {
     const aria2json = getAria2JSON(cfg);
-    wsConn.send(aria2json.pause(item.gid));
+    if (impatientTest()) {
+      wsConn.send(aria2json.pause(item.gid));
+    } else {
+      wsConn.send(aria2json.forcePause(item.gid));
+    }
+    lastClick = +new Date();
   }
 
-  // TODO: force remove on double click or if spammed
   async function handleRemoveClick() {
     const aria2json = getAria2JSON(cfg);
-    wsConn.send(aria2json.remove(item.gid));
+    if (impatientTest()) {
+      wsConn.send(aria2json.forceRemove(item.gid));
+    } else {
+      wsConn.send(aria2json.remove(item.gid));
+    }
+    lastClick = +new Date();
   }
 
   async function handleClearClick() {
