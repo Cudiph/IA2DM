@@ -66,6 +66,7 @@ export function resetConfig() {
  */
 export function bestBytesString(bytesize, opts = {}) {
   let { withUnit = true, comparison } = opts;
+  if (!bytesize) return `0${withUnit ? ' B' : ''}`;
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']; // No sane person would reach pettabytes
   let counter = 0;
   let compareCounter = 0;
