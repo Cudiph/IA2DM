@@ -311,6 +311,7 @@ browser.commands.onCommand.addListener(async (cmd) => {
       if (badgeTimeoutID) clearTimeout(badgeTimeoutID);
       badgeTimeoutID = setTimeout(() => {
         browser.action.setBadgeText({ text: '' });
+        badgeTimeoutID = null;
       }, 3000);
     });
   }
