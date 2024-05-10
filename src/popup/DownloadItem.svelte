@@ -4,7 +4,7 @@
   import clearIcon from '../assets/delete-outline.svg';
   import xIcon from '../assets/close.svg';
   import stopIcon from '../assets/stop.svg';
-  import { wsConn, cfg, selectedItem, page, storageCache } from './store';
+  import { wsConn, cfg, selectedItem, storageCache } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDefaultIcon } from '../lib/graphics';
   import { bestBytesString, bestTimeString, findAndRemoveHistory, capitalize } from '../lib/util';
@@ -89,34 +89,36 @@
       </div>
     {/if}
     <div class="etc">
-      <!-- TODO: split seeder to its own block -->
       {#if item.seeder}
         <span style="color: var(--color-complete); font-weight: 500;">Seeding</span>
-      {:else if item.status !== 'active'}
-        <span style="color: var(--color-{item.status}); font-weight: 500;"
+        <span class:hide={!hasDetail}>-</span>
+        <span class:hide={!item.uploadLength}
+          >{bestBytesString(item.uploadLength)} ({parseFloat(
+            (item.uploadLength / item.completedLength).toFixed(2)
+          )}:1)</span
+        >
+        {#if item.uploadSpeed && item.seeder}
+          <span>({bestBytesString(item.uploadSpeed)}/sec)</span>
+        {/if}
+      {:else}
+        <span
+          class:hide={item.status === 'active'}
+          style="color: var(--color-{item.status}); font-weight: 500;"
           >{capitalize(item.status)}</span
         >
-      {/if}
-      {#if item.status === 'active' && !item.seeder}
-        <span
+        <span class:hide={item.status !== 'active'}
           >{bestTimeString(calculateETA(item.dlSpeed, item.completedLength, item.filesize))} left</span
         >
-      {/if}
-      {#if hasDetail}
-        <!-- <span>—</span> -->
-        <span>-</span>
-      {/if}
-      {#if item.completedLength && item.status !== 'complete' && !item.seeder}
-        <span>{bestBytesString(item.completedLength, { comparison: item.filesize })} /</span>
-      {/if}
-      {#if item.filesize > 0}
-        <span>{bestBytesString(item.filesize)}</span>
-      {/if}
-      {#if item.uploadSpeed && item.seeder}
-        <span>({bestBytesString(item.uploadSpeed)}/sec)</span>
-      {/if}
-      {#if item.dlSpeed && item.status === 'active'}
-        <span>({bestBytesString(item.dlSpeed)}/sec)</span>
+        <span class:hide={!hasDetail}>-</span>
+        {#if item.completedLength && item.status !== 'complete'}
+          <span>{bestBytesString(item.completedLength, { comparison: item.filesize })} /</span>
+        {/if}
+        {#if item.filesize > 0}
+          <span class:hide={item.filesize <= 0}>{bestBytesString(item.filesize)}</span>
+        {/if}
+        {#if item.dlSpeed && item.status === 'active'}
+          <span>({bestBytesString(item.dlSpeed)}/sec)</span>
+        {/if}
       {/if}
       {#if item.basename.indexOf('.') !== -1}
         <span class="capsule">{item.basename.split('.').pop()}</span>

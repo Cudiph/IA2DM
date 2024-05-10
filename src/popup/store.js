@@ -10,16 +10,16 @@ export let wsConn = null;
 
 export let cfg = null;
 /** @type {page} */
-export let page = readable('main', (set) => {
+export let page = readable(window.location.hash, (set) => {
   function hashChangeHandler() {
     set(window.location.hash);
   }
-  
-  window.addEventListener('hashchange', hashChangeHandler)
+
+  window.addEventListener('hashchange', hashChangeHandler);
 
   return function stop() {
-    window.removeEventListener('hashchange', hashChangeHandler)
-  }
+    window.removeEventListener('hashchange', hashChangeHandler);
+  };
 });
 /** @type {import("svelte/store").Writable<DownloadItem>} */
 export let selectedItem = writable({

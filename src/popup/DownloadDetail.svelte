@@ -1,5 +1,5 @@
 <script>
-  import { page, selectedItem } from './store';
+  import { selectedItem } from './store';
   import { getDefaultIcon } from '../lib/graphics';
   import { bestBytesString, bestTimeString, capitalize } from '../lib/util';
 </script>
