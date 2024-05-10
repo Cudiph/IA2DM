@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { slide } from 'svelte/transition';
   export let title = 'Title';
   export let hide = true;
@@ -7,7 +7,10 @@
     hide = !hide;
   }
 
-  function handleKeydown(e: KeyboardEvent) {
+  /**
+   * @param {KeyboardEvent} e
+   */
+  function handleKeydown(e) {
     if ((e.code === 'Space' || e.code === 'Enter') && e.target === document.activeElement) toggle();
   }
 </script>
