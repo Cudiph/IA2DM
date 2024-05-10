@@ -105,7 +105,7 @@
         };
 
         // reactive detail
-        if (item.gid === $selectedItem?.gid && $page === 'item-detail') {
+        if (item.gid === $selectedItem?.gid) {
           $selectedItem = downloadItemStruct;
         }
 
@@ -155,9 +155,9 @@
 </script>
 
 <div class="root-container">
-  {#if $page === 'add'}
+  {#if $page === '#add'}
     <Add />
-  {:else if $page === 'item-detail'}
+  {:else if $page === '#item-detail'}
     <DownloadDetail />
   {:else}
     <Header {ws} />

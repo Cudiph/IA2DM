@@ -62,7 +62,7 @@
 
   function openDetailPage() {
     $selectedItem = item;
-    $page = 'item-detail';
+    location.hash = '#item-detail';
   }
 </script>
 

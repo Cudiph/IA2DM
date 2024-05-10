@@ -37,7 +37,7 @@
       <td>Status</td>
       <td>{$selectedItem.seeder ? 'Seeding' : capitalize($selectedItem.status)}</td>
     </tr>
-    <tr>
+    <tr class:hide={!$selectedItem.completedLength}>
       <td>Downloaded</td>
       <td
         >{bestBytesString($selectedItem.completedLength)} ({(
@@ -91,7 +91,7 @@
     </tr>
   </table>
 
-  <button on:click={() => ($page = 'main')}>Done</button>
+  <button on:click={() => (location.hash = '#main')}>Done</button>
 </div>
 
 <style>

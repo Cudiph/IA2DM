@@ -46,7 +46,7 @@
 
 <header>
   <div class="dl-action flex">
-    <button on:click={() => ($page = 'add')} title={ADD_TITLE}>
+    <button on:click={() => (location.hash = '#add')} title={ADD_TITLE}>
       <img class="img-icon" src={addIcon} alt="Add new download" />
     </button>
     <div class="separator"></div>

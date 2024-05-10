@@ -45,7 +45,7 @@
       };
       browser.storage.local.set({ activeDownload });
       setTimeout(() => {
-        $page = 'main';
+        location.hash = '#main';
       }, 1000);
     } catch (e) {
       error = e;
@@ -67,7 +67,7 @@
       {/if}
     </div>
     <button on:click={addNewDownloadHandler}>Add</button>
-    <button on:click={(_) => ($page = 'main')}>cancel</button>
+    <button on:click={(_) => (location.hash = '#main')}>cancel</button>
   {:else}
     <h1>Not connected to any aria2 instance</h1>
   {/if}

@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { readable, writable } from 'svelte/store';
 import browser from 'webextension-polyfill';
 import { check_connection } from '../lib/util';
 
@@ -10,7 +10,17 @@ export let wsConn = null;
 
 export let cfg = null;
 /** @type {page} */
-export let page = writable('main');
+export let page = readable('main', (set) => {
+  function hashChangeHandler() {
+    set(window.location.hash);
+  }
+  
+  window.addEventListener('hashchange', hashChangeHandler)
+
+  return function stop() {
+    window.removeEventListener('hashchange', hashChangeHandler)
+  }
+});
 /** @type {import("svelte/store").Writable<DownloadItem>} */
 export let selectedItem = writable({
   gid: '0',
