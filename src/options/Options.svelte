@@ -63,7 +63,14 @@
   );
 
   async function addServer() {
-    $RPCs.push({ name: 'Unconfigured Server', host: 'localhost', port: 6800 });
+    $RPCs.push({
+      name: 'Unconfigured Server',
+      host: 'localhost',
+      port: 6800,
+      secret: '',
+      secure: false,
+      options: {},
+    });
     $RPCs = [...$RPCs];
   }
 
