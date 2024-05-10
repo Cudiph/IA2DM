@@ -3,7 +3,7 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { getWSConn, page, cfg } from './store';
+  import { getWSConn, page, cfg, selectedItem } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDirnameBasename, getFolderName } from '../lib/util';
   import DownloadDetail from './DownloadDetail.svelte';
@@ -45,21 +45,7 @@
   function initIntervalPolling() {
     const aria2json = getAria2JSON(cfg, { id: 'popupIntervalPolling' });
     const handler = () => {
-      const props = [
-        'gid',
-        'status',
-        'totalLength',
-        'completedLength',
-        'uploadLength',
-        'downloadSpeed',
-        'uploadSpeed',
-        'files',
-        'dir',
-        'seeder',
-        'connections',
-        'errorMessage',
-      ];
-      ws.send(`[${aria2json.tellActive(props)}, ${aria2json.tellWaiting(0, 9999, props)}]`);
+      ws.send(`[${aria2json.tellActive()}, ${aria2json.tellWaiting(0, 9999)}]`);
     };
     handler();
     intervalID = setInterval(handler, 1000);
@@ -91,25 +77,37 @@
         }
         const theUri = item.files[0]?.uris[0]?.uri;
         const saved = activeDownload[item.gid];
-        /** @type {DownloadItem} */
         const downloadItemStruct = {
           gid: item.gid,
           icon: saved?.icon || '',
           dirname,
           basename: basename || theUri || 'Unknown filename',
           status: item.status,
-          seeder: item.seeder === "true" ? true : false,
+          url: saved?.url || theUri || '',
+          seeder: item.seeder === 'true' ? true : false,
           uploadSpeed: parseInt(item.uploadSpeed),
           dlSpeed: parseInt(item.downloadSpeed),
           connections: parseInt(item.connections),
           completedLength: parseInt(item.completedLength),
           uploadLength: parseInt(item.uploadLength),
-          url: saved?.url || theUri || '',
+          pieceLength: parseInt(item.pieceLength),
+          numPieces: parseInt(item.numPieces),
+          numSeeders: parseInt(item.numSeeders),
           filesize: parseInt(item.totalLength),
           serverName: saved?.serverName || '',
           startTime: saved?.startTime,
+          finishTime: 0,
           errorMsg: item.errorMessage,
+          infoHash: item.infoHash,
+          bittorrent: item.bittorrent,
+          verifiedLength: item.verifiedLength,
+          verifyIntegrityPending: item.verifyIntegrityPending,
         };
+
+        // reactive detail
+        if (item.gid === $selectedItem?.gid && $page === 'item-detail') {
+          $selectedItem = downloadItemStruct;
+        }
 
         newActiveDownloads.push(downloadItemStruct);
       }

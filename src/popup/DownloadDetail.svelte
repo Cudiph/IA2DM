@@ -1,7 +1,7 @@
 <script>
   import { page, selectedItem } from './store';
   import { getDefaultIcon } from '../lib/graphics';
-  import { bestTimeString } from '../lib/util';
+  import { bestBytesString, bestTimeString, capitalize } from '../lib/util';
 </script>
 
 <div class="container">
@@ -10,6 +10,12 @@
     <span class="basename">{$selectedItem.basename}</span>
   </div>
 
+  <span><b>Upload:</b> {bestBytesString($selectedItem.uploadSpeed)}/s</span>
+  <span><b>Download:</b> {bestBytesString($selectedItem.dlSpeed)}/s</span>
+  <span class:hide={!$selectedItem.connections}
+    ><b>Connections:</b> {$selectedItem.connections}</span
+  >
+  <span class:hide={!$selectedItem.seeder}><b>Seeders:</b> {$selectedItem.numSeeders}</span>
   <table>
     <tr>
       <th>Key</th>
@@ -27,13 +33,38 @@
       <td>File location</td>
       <td>{$selectedItem.dirname ? `${$selectedItem.dirname}/` : ''}{$selectedItem.basename}</td>
     </tr>
-    <tr style="color: var(--color-{$selectedItem.status})">
+    <tr style="color: var(--color-{$selectedItem.seeder ? 'complete' : $selectedItem.status})">
       <td>Status</td>
-      <td>{$selectedItem.status}</td>
+      <td>{$selectedItem.seeder ? 'Seeding' : capitalize($selectedItem.status)}</td>
+    </tr>
+    <tr>
+      <td>Downloaded</td>
+      <td
+        >{bestBytesString($selectedItem.completedLength)} ({(
+          ($selectedItem.completedLength / $selectedItem.filesize) *
+          100
+        ).toFixed(1)}%)</td
+      >
+    </tr>
+    <tr class:hide={!$selectedItem.uploadLength}>
+      <td>Uploaded</td>
+      <td
+        >{bestBytesString($selectedItem.uploadLength)} ({parseFloat(
+          ($selectedItem.uploadLength / $selectedItem.completedLength).toFixed(2)
+        )}:1)</td
+      >
+    </tr>
+    <tr>
+      <td>Total Filesize</td>
+      <td>{bestBytesString($selectedItem.filesize)}</td>
     </tr>
     <tr>
       <td>Config used</td>
       <td>{$selectedItem.serverName || '[EXTERNAL]'}</td>
+    </tr>
+    <tr class:hide={!$selectedItem.infoHash}>
+      <td>Info hash</td>
+      <td>{$selectedItem.infoHash}</td>
     </tr>
     <tr class:hide={!$selectedItem.startTime}>
       <td>Time started</td>
@@ -43,10 +74,17 @@
       <td>Time finished</td>
       <td>{new Date($selectedItem.finishTime).toLocaleString()}</td>
     </tr>
-    <tr class:hide={!$selectedItem.startTime || !$selectedItem.finishTime}>
-      <td>Duration</td>
-      <td>{bestTimeString(($selectedItem.finishTime - $selectedItem.startTime) / 1000)}</td>
-    </tr>
+    {#if $selectedItem.startTime && $selectedItem.finishTime}
+      {@const durationInSeconds = ($selectedItem.finishTime - $selectedItem.startTime) / 1000}
+      <tr>
+        <td>Duration</td>
+        <td>{bestTimeString(durationInSeconds)}</td>
+      </tr>
+      <tr class:hide={!$selectedItem.filesize}>
+        <td>Avg. speed</td>
+        <td>{bestBytesString($selectedItem.filesize / durationInSeconds)}/s</td>
+      </tr>
+    {/if}
     <tr class:hide={!$selectedItem.errorMsg} style="color: var(--color-error)">
       <td>Error Message</td>
       <td>{$selectedItem.errorMsg}</td>

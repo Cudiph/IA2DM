@@ -7,7 +7,7 @@
   import { wsConn, cfg, selectedItem, page, storageCache } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDefaultIcon } from '../lib/graphics';
-  import { bestBytesString, bestTimeString, findAndRemoveHistory } from '../lib/util';
+  import { bestBytesString, bestTimeString, findAndRemoveHistory, capitalize } from '../lib/util';
 
   /** @type {DownloadItem} */
   export let item;
@@ -58,11 +58,6 @@
   function calculateETA(dlSpeed, completed, fullLength) {
     const rest = fullLength - completed;
     return rest / dlSpeed;
-  }
-
-  /** @param {string} txt */
-  function capitalize(txt) {
-    return txt[0].toUpperCase() + txt.slice(1);
   }
 
   function openDetailPage() {

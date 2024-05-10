@@ -166,3 +166,8 @@ export async function findAndRemoveHistory(gid) {
 
   browser.storage.local.set({ dlHistory });
 }
+
+/** @param {string} txt */
+export function capitalize(txt) {
+  return txt[0].toUpperCase() + txt.slice(1);
+}

@@ -37,6 +37,7 @@ interface DownloadItem {
   dirname: string;
   basename: string;
   status: aria2_status;
+  url?: string;
 
   // active/in progress exclusive
   seeder?: boolean;
@@ -47,13 +48,27 @@ interface DownloadItem {
   uploadLength?: number;
 
   // extra info
-  url?: string;
+  pieceLength?: number;
+  numPieces?: number;
+  numSeeders?: number;
   bitfield?: string;
   filesize?: number;
   serverName?: string;
   startTime?: number;
   finishTime?: number;
   errorMsg?: string;
+  infoHash?: string;
+  bittorrent?: {
+    announceList: any[];
+    comment: string;
+    creationDate: number;
+    mode: 'single' | 'multi';
+    info: {
+      name: string;
+    };
+  };
+  verifiedLength?: number;
+  verifyIntegrityPending?: boolean;
 }
 
 // structure stored in the root of local browser storage

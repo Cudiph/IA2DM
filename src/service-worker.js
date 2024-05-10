@@ -201,17 +201,9 @@ async function moveToDLHistory(cfg, data) {
 
   for (const i of data.params) {
     let item = activeDownload[i.gid];
-    const res = await aria2.tellStatus(i.gid, [
-      'status',
-      'totalLength',
-      'completedLength',
-      'errorMessage',
-      'files',
-      'dir',
-    ]);
+    const res = await aria2.tellStatus(i.gid);
     const { result } = await res.json();
     const theUri = result.files[0]?.uris[0]?.uri;
-    console.log(result);
 
     let dirname, basename;
     const folderName = await getFolderName(result.dir, result.files[0]?.path);
@@ -222,17 +214,32 @@ async function moveToDLHistory(cfg, data) {
       [dirname, basename] = await getDirnameBasename(result.files[0]?.path);
     }
 
-    // bare minimum property
+    // default value
     const download_obj = {
       gid: i.gid,
-      url: theUri || '',
       icon: '',
       dirname,
       basename: basename || theUri || 'Unknown filename',
-      completedLength: parseInt(result.completedLength),
-      filesize: parseInt(result.totalLength),
       status: result.status,
+      url: theUri || '',
+      seeder: result.seeder === 'true' ? true : false,
+      uploadSpeed: parseInt(result.uploadSpeed),
+      dlSpeed: parseInt(result.downloadSpeed),
+      connections: parseInt(result.connections),
+      completedLength: parseInt(result.completedLength),
+      uploadLength: parseInt(result.uploadLength),
+      pieceLength: parseInt(result.pieceLength),
+      numPieces: parseInt(result.numPieces),
+      numSeeders: parseInt(result.numSeeders),
+      filesize: parseInt(result.totalLength),
+      serverName: '',
+      startTime: 0,
+      finishTime: 0,
       errorMsg: result.errorMessage,
+      infoHash: result.infoHash,
+      bittorrent: result.bittorrent,
+      verifiedLength: result.verifiedLength,
+      verifyIntegrityPending: result.verifyIntegrityPending,
     };
 
     // item will be empty if its not handled from this extension
