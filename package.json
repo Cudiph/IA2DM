@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run build && vite build --watch",
+    "dev": "export NODE_ENV=dev || set NODE_ENV=dev&& npm run build:manifest && vite build",
     "build": "vite build && npm run build:manifest",
     "build:manifest": "node scripts/build.cjs",
     "format": "prettier --write .",
