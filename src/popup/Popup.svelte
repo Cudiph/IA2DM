@@ -67,13 +67,13 @@
     const { activeDownload } = await browser.storage.local.get('activeDownload');
     for (const res of data) {
       for (const item of res.result) {
-        const folderName = await getFolderName(item.dir, item.files[0].path);
+        const folderName = getFolderName(item.dir, item.files[0].path);
         let dirname, basename;
-        if (folderName) {
+        if (folderName && item.dir && !item.files[0].path.startWith('./')) {
           dirname = item.dir;
           basename = folderName;
         } else {
-          [dirname, basename] = await getDirnameBasename(item.files[0].path);
+          [dirname, basename] = getDirnameBasename(item.files[0].path);
         }
         const theUri = item.files[0]?.uris[0]?.uri;
         const saved = activeDownload[item.gid];
