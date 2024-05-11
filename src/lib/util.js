@@ -87,24 +87,25 @@ export function bestBytesString(bytesize, opts = {}) {
   return `${parseFloat(bytesize.toFixed(2))}${withUnit ? ' ' + units[counter] : ''}`;
 }
 
-export async function getOSPathSeparator() {
-  let separator = '/';
-  if (!os) {
-    const platform = await browser.runtime.getPlatformInfo();
-    os = platform.os;
-    if (os === 'win') separator = '\\';
-  }
-
-  return separator;
+/**
+ * there is some inconsistency when in windows, 
+ * so I guess I'll just change windows path to unix path.
+ * @param {string} filename
+ * @returns
+ */
+export function converttoUnixPath(filename) {
+  return filename.replaceAll('\\', '/');
 }
 
-// TODO: test path on michaelsoft binbows OS
 /**
  * @param {string} filename
- * @returns {Promise<[string, string]>}
+ * @returns {[string, string]}
  */
-export async function getDirnameBasename(filename) {
-  let separator = await getOSPathSeparator();
+export function getDirnameBasename(filename) {
+  if (navigator.userAgent.includes('Windows')) {
+    filename = converttoUnixPath(filename);
+  }
+  let separator = '/';
   const splitted = filename.split(separator);
   const basename = splitted.pop();
   const dirname = splitted.join(separator);
@@ -119,8 +120,13 @@ export async function getDirnameBasename(filename) {
  * @param {string} rootDir
  * @param {string} fullFilePath
  */
-export async function getFolderName(rootDir, fullFilePath) {
-  let separator = await getOSPathSeparator();
+export function getFolderName(rootDir, fullFilePath) {
+  if (navigator.userAgent.includes('Windows')) {
+    rootDir = converttoUnixPath(rootDir);
+    fullFilePath = converttoUnixPath(fullFilePath);
+  }
+
+  let separator = '/';
   if (!fullFilePath.startsWith(rootDir)) return '';
 
   let relativePath = fullFilePath.replace(rootDir, '').split(separator);

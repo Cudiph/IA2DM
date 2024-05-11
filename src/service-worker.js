@@ -58,7 +58,7 @@ browser.downloads.onCreated.addListener(async (item) => {
   const aria2 = getAria2OOP(rpcOnlineCfg);
   connectWebsocket(rpcOnlineCfg);
 
-  const [dirname, basename] = await getDirnameBasename(item.filename);
+  const [dirname, basename] = getDirnameBasename(item.filename);
   if (!rpcOnlineCfg.options.dir) rpcOnlineCfg.options.dir = dirname;
   rpcOnlineCfg.options.out = basename;
 
@@ -206,12 +206,12 @@ async function moveToDLHistory(cfg, data) {
     const theUri = result.files[0]?.uris[0]?.uri;
 
     let dirname, basename;
-    const folderName = await getFolderName(result.dir, result.files[0]?.path);
+    const folderName = getFolderName(result.dir, result.files[0]?.path);
     if (folderName) {
       dirname = result.dir;
       basename = folderName;
     } else {
-      [dirname, basename] = await getDirnameBasename(result.files[0]?.path);
+      [dirname, basename] = getDirnameBasename(result.files[0]?.path);
     }
 
     // default value
