@@ -296,11 +296,12 @@ function connectWebsocket(cfg) {
 }
 
 browser.runtime.onMessage.addListener(async (data, _) => {
-  if (data.type !== 'poke') return;
-
-  const { RPCs } = await browser.storage.local.get(['RPCs']);
-  const onlineIdx = await check_connection(RPCs);
-  connectWebsocket(RPCs[onlineIdx]);
+  if (data.type === 'poke') {
+    if (wsConn) return;
+    const { RPCs } = await browser.storage.local.get(['RPCs']);
+    const onlineIdx = await check_connection(RPCs);
+    connectWebsocket(RPCs[onlineIdx]);
+  }
 });
 
 browser.commands.onCommand.addListener(async (cmd) => {
