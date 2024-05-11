@@ -207,7 +207,7 @@ async function moveToDLHistory(cfg, data) {
 
     let dirname, basename;
     const folderName = getFolderName(result.dir, result.files[0]?.path);
-    if (folderName && item.dir && !item.files[0].path.startWith('./')) {
+    if (folderName && item.dir && !item.files[0]?.path?.startsWith('./')) {
       dirname = result.dir;
       basename = folderName;
     } else {

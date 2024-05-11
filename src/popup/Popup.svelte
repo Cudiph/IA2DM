@@ -69,7 +69,7 @@
       for (const item of res.result) {
         const folderName = getFolderName(item.dir, item.files[0].path);
         let dirname, basename;
-        if (folderName && item.dir && !item.files[0].path.startWith('./')) {
+        if (folderName && item.dir && !item.files[0]?.path?.startsWith('./')) {
           dirname = item.dir;
           basename = folderName;
         } else {

@@ -40,6 +40,7 @@
             await aria2.addMetalink(content, cfg.options);
           }
         }
+        success = true;
         setTimeout(() => {
           location.hash = '#main';
         }, 1000);
