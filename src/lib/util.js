@@ -88,7 +88,7 @@ export function bestBytesString(bytesize, opts = {}) {
 }
 
 /**
- * there is some inconsistency when in windows, 
+ * there is some inconsistency when in windows,
  * so I guess I'll just change windows path to unix path.
  * @param {string} filename
  * @returns

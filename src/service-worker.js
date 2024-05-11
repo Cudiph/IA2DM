@@ -200,14 +200,14 @@ async function moveToDLHistory(cfg, data) {
   }
 
   for (const i of data.params) {
-    let item = activeDownload[i.gid];
+    let activeDlCache = activeDownload[i.gid];
     const res = await aria2.tellStatus(i.gid);
     const { result } = await res.json();
     const theUri = result.files[0]?.uris[0]?.uri;
 
     let dirname, basename;
     const folderName = getFolderName(result.dir, result.files[0]?.path);
-    if (folderName && item.dir && !item.files[0]?.path?.startsWith('./')) {
+    if (folderName && result.dir && !result.files[0]?.path?.startsWith('./')) {
       dirname = result.dir;
       basename = folderName;
     } else {
@@ -242,11 +242,11 @@ async function moveToDLHistory(cfg, data) {
       verifyIntegrityPending: result.verifyIntegrityPending,
     };
 
-    // item will be empty if its not handled from this extension
-    item = item ? Object.assign(download_obj, item) : download_obj;
+    // activeDlCache will be empty if its not handled from this extension
+    activeDlCache = activeDlCache ? Object.assign(download_obj, activeDlCache) : download_obj;
 
-    item.finishTime = +new Date();
-    dlHistory.unshift(item);
+    activeDlCache.finishTime = +new Date();
+    dlHistory.unshift(activeDlCache);
     delete activeDownload[i.gid];
   }
   bslocal.set({ activeDownload, dlHistory });
