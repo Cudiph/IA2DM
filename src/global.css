@@ -13,6 +13,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   --fg-color: #fff;
+  --fg-color-dim: #ccc;
   --bg-color: #000;
   --bg-color-hover: #444;
   --color-active: #a5d0e6;
@@ -100,6 +101,7 @@ button:focus-visible {
     color: #000;
     background-color: #ffffff;
     --fg-color: #000;
+    --fg-color: #555;
     --bg-color: #fff;
     --bg-color-hover: #ccc;
     --color-active: #393fb1;

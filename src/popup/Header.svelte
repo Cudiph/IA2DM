@@ -1,4 +1,5 @@
 <script>
+  import Toggle from '../lib/Toggle.svelte';
   import addIcon from '../assets/plus.svg';
   import resumeIcon from '../assets/play.svg';
   import pauseIcon from '../assets/pause.svg';
@@ -31,8 +32,7 @@
     browser.storage.local.set({ dlHistory: [] });
   }
 
-  function handleToggleIntercept() {
-    intercept = !intercept;
+  $: {
     browser.storage.local.set({ intercept });
   }
 
@@ -75,11 +75,7 @@
     <button on:click={() => browser.runtime.openOptionsPage()} title={SETTINGS_TITLE}>
       <img class="img-icon" src={settingsIcon} alt="Settings" />
     </button>
-    <button class="toggle-button" on:click={handleToggleIntercept} title={TOGGLE_TITLE}>
-      <div class="toggle" class:toggle-enabled={intercept} class:toggle-disabled={!intercept}>
-        <div class="circle"></div>
-      </div>
-    </button>
+    <Toggle bind:booleanInput={intercept} title={TOGGLE_TITLE} />
   </div>
 </header>
 
@@ -122,43 +118,8 @@
     border-right: solid 2px #aaa;
   }
 
-  .toggle-button {
-    width: 50px;
-  }
-
-  .toggle-button:hover,
-  .toggle-button:focus {
-    background-color: unset;
-  }
-
-  .toggle-enabled {
-    justify-content: end;
-    background-color: var(--color-active);
-  }
-
-  .toggle-disabled {
-    background-color: var(--bg-color-hover);
-  }
-
-  .toggle {
-    transition: all 0.5s;
-    display: flex;
-    align-items: center;
-    width: 50px;
-    height: 24px;
-    border-radius: 16px;
-    text-align: right;
-  }
-
-  .circle {
-    width: 16px;
-    height: 16px;
-    margin: 0 3px;
-    background-color: var(--bg-color);
-    border-radius: 100%;
-  }
-
   .circle-small {
+    border-radius: 50%;
     width: 12px;
     height: 12px;
   }

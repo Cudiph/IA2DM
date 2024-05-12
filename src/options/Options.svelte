@@ -1,6 +1,7 @@
 <script>
   import browser from 'webextension-polyfill';
   import ServerProp from './ServerProp.svelte';
+  import Toggle from '../lib/Toggle.svelte';
   import { RPCs } from './store';
 
   let has_required_optional_perms = true;
@@ -166,27 +167,30 @@
     <h2>Global</h2>
     <label>
       <!-- TODO: add warning -->
-      <input type="checkbox" on:click={checkAllPerm} bind:checked={sendCookies} />
-      Send Cookies
+      <input type="checkbox" bind:checked={sendCookies} />
+      <span>Send Cookies</span>
+      <Toggle bind:booleanInput={sendCookies} on:click={checkAllPerm} />
     </label>
 
     <label>
-      <input type="checkbox" on:click={checkAllPerm} bind:checked={sendReferer} />
-      Send Referer
+      <input type="checkbox" bind:checked={sendReferer} />
+      <span>Send Referer</span>
+      <Toggle bind:booleanInput={sendReferer} on:click={checkAllPerm} />
     </label>
 
     <label>
       <input type="checkbox" bind:checked={intercept} />
-      Intercept Download
+      <span>Intercept Download</span>
+      <Toggle bind:booleanInput={intercept} />
     </label>
 
     <label>
-      Progress Color:
+      <span>Progress Color:</span>
       <input type="text" bind:value={progressColor} />
     </label>
 
     <label>
-      Progress Outline Color:
+      <span>Progress Outline Color:</span>
       <input type="text" bind:value={progressOutlineColor} />
     </label>
 
@@ -221,12 +225,16 @@
 
   .server-cfg-container {
     padding: 5px;
-    border: solid 1px white;
+    border: solid 1px var(--fg-color);
     margin: 10px;
   }
 
   .message p {
     padding: 10px;
     border-radius: 10px;
+  }
+
+  input[type='checkbox'] {
+    display: none;
   }
 </style>
