@@ -13,7 +13,8 @@ const bslocal = browser.storage.local;
 const dl = browser.downloads;
 /** @type {WebSocket} */
 let wsConn = null;
-let intervalID = null;
+let progressIntervalID = null;
+let downloadEndIntervalID = null;
 let holdCompleteIcon = false;
 let badgeTimeoutID = null;
 
@@ -113,7 +114,7 @@ browser.downloads.onCreated.addListener(async (item) => {
 /**
  * @param {RPCConfig} cfg
  */
-function initInterval(cfg) {
+function initProgressInterval(cfg) {
   /** @type {any} */
   const aria2json = getAria2JSON(cfg, { id: 'intervalRequest' });
   return setInterval(() => {
@@ -127,10 +128,23 @@ function initInterval(cfg) {
   }, 2000);
 }
 
-function finiInterval() {
+/**
+ * when user click pause and remove download, the websocket notification
+ * is not triggered so its just additional check
+ * @param {RPCConfig} cfg
+ */
+function initDownloadEndInterval(cfg) {
+  return setInterval(() => {
+    onDownloadEnd(cfg);
+  }, 10000);
+}
+
+/**
+ * @param {number} intervalID
+ */
+function finiInterval(intervalID) {
   clearInterval(intervalID);
-  intervalID = null;
-  wsConn = null;
+  progressIntervalID = null;
 }
 
 /** @param {jsonRPCResponse[]} data */
@@ -161,7 +175,8 @@ function onDownloadEnd(cfg) {
   wsConn.send(`[${aria2json.getGlobalStat()}]`);
 }
 
-/** check for every active download then close the websocket connection
+/**
+ * check for every active download then close the websocket connection
  * @param {any} data
  */
 async function onDownloadEndResponseHandler(data) {
@@ -260,7 +275,8 @@ function connectWebsocket(cfg) {
   wsConn = new WebSocket(uri);
 
   wsConn.onopen = (_) => {
-    intervalID = initInterval(cfg);
+    progressIntervalID = initProgressInterval(cfg);
+    downloadEndIntervalID = initDownloadEndInterval(cfg);
   };
 
   // for websocket when sending a message, the request should be in array
@@ -288,10 +304,12 @@ function connectWebsocket(cfg) {
   };
 
   wsConn.onclose = (_) => {
-    finiInterval();
+    finiInterval(downloadEndIntervalID);
+    finiInterval(progressIntervalID);
     setTimeout(() => {
       resetActionIcon();
     }, 3000);
+    wsConn = null;
   };
 }
 
