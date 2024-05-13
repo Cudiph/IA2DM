@@ -24,7 +24,7 @@
     on:click={toggle}
     role="button"
   >
-    <span>{title}</span>
+    <span class="title">{title}</span>
     <span class="marker"
       ><svg
         xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@
         class="mdi-plus marker"
         width="20"
         height="20"
-        viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg
+        viewBox="0 0 20 20"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg
       ></span
     >
   </div>
@@ -45,7 +45,7 @@
     on:click={toggle}
     role="button"
   >
-    <span>{title}</span>
+    <span class="title">{title}</span>
     <span
       ><svg
         xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@
         class="mdi-minus marker"
         width="20"
         height="20"
-        viewBox="0 0 24 24"><path d="M19,13H5V11H19V13Z" /></svg
+        viewBox="0 0 20 20"><path d="M19,13H5V11H19V13Z" /></svg
       ></span
     >
   </div>
@@ -75,7 +75,7 @@
   }
 
   .handler > span {
-    font-size: 16px;
+    align-content: center;
   }
 
   .opened {
@@ -88,5 +88,10 @@
 
   .marker {
     fill: var(--fg-color);
+  }
+
+  .title {
+    font-weight: 800;
+    font-size: 23px;
   }
 </style>

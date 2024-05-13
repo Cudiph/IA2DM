@@ -16,6 +16,7 @@
   --fg-color-dim: #ccc;
   --bg-color: #000;
   --bg-color-hover: #444;
+  --bg-color-lighter: #222;
   --color-active: #a5d0e6;
   --color-paused: #ffffa8;
   --color-error: #f08e97;
@@ -76,17 +77,17 @@ button:focus-visible {
 }
 
 .success {
-  background-color: #004400;
+  background-color: #00ff0044;
   border: solid 1px green;
 }
 
 .failed {
-  background-color: #440000;
+  background-color: #ff000044;
   border: solid 1px red;
 }
 
 .warning {
-  background-color: #444400;
+  background-color: #ffff0044;
   border: solid 1px yellow;
 }
 
@@ -104,6 +105,7 @@ button:focus-visible {
     --fg-color: #555;
     --bg-color: #fff;
     --bg-color-hover: #ccc;
+    --bg-color-lighter: #ddd;
     --color-active: #393fb1;
     --color-paused: #cccc00;
     --color-error: #d2403b;

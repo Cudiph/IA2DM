@@ -1,7 +1,9 @@
 <script>
   import Collapser from '../lib/Collapser.svelte';
+  import Toggle from '../lib/Toggle.svelte';
   import { getAria2OOP } from '../lib/aria2rpc';
   import { RPCs } from './store';
+  import './shared.css';
 
   /** @type {RPCConfig} */
   export let rpcConfig;
@@ -131,53 +133,73 @@
 </script>
 
 <Collapser title={rpcConfig.name + ` #${index + 1}`} hide={!index ? false : true}>
-  <label>
-    Profile Name:
+  <label title="sdfsdf">
+    <span>Profile Name</span>
     <input type="text" bind:value={rpcConfig.name} />
   </label>
-  <label
-    >RPC hostname/address:
+
+  <span class="subheader">Connection</span>
+  <hr />
+  <label>
+    <span>RPC hostname/address</span>
     <input type="text" bind:value={rpcConfig.host} />
   </label>
-  <label
-    >RPC Port:
+  <label>
+    <span>RPC Port</span>
     <input type="number" min="1000" max="65530" bind:value={rpcConfig.port} />
   </label>
-  <label
-    >RPC Secret:
+  <label>
+    <span>RPC Secret</span>
     <input type="password" bind:value={rpcConfig.secret} />
   </label>
+
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label>
-    <input type="checkbox" bind:checked={rpcConfig.secure} />
-    Secure
+    <span>Secure</span>
+    <Toggle bind:booleanInput={rpcConfig.secure} />
   </label>
 
-  <span>Quick Options</span>
-  <label
-    >Save files to:
+  <span class="subheader">Quick Options</span>
+  <hr />
+  <label>
+    <span>Save files to</span>
     <input type="text" bind:value={saveDir} on:input={handleSaveTo} />
   </label>
 
+  <!-- svelte-ignore a11y-label-has-associated-control -->
   <label>
-    <input type="checkbox" bind:checked={useUserAgent} on:click={handleUseUserAgent} />
-    Use browser user agent
+    <span>Use browser user agent</span>
+    <Toggle bind:booleanInput={useUserAgent} on:click={handleUseUserAgent} />
   </label>
 
-  <span>Aria2 Options Table:</span>
+  <span class="subheader">Aria2 Options Table</span>
+  <hr />
   <table>
-    <tr>
-      <th>Key</th>
-      <th>Value</th>
-      <th></th>
-    </tr>
-    {#each optionKey as k, i}
+    <thead>
       <tr>
-        <td><input type="text" bind:value={k} /></td>
-        <td><input type="text" bind:value={optionValue[i]} /></td>
-        <td><button on:click={() => removeByIndex(i)} class="delete-button">x</button></td>
+        <th>Key</th>
+        <th>Value</th>
+        <th></th>
       </tr>
-    {/each}
-    <button on:click={addNewOption}>+</button>
+    </thead>
+    <tbody>
+      {#each optionKey as k, i}
+        <tr>
+          <td class="key"><input type="text" bind:value={k} /></td>
+          <td><input type="text" bind:value={optionValue[i]} /></td>
+          <td style="width: 5%;"
+            ><button on:click={() => removeByIndex(i)} class="tbl-button">⨉</button></td
+          >
+        </tr>
+      {/each}
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+          <button on:click={addNewOption} class="tbl-button">＋</button>
+        </td>
+      </tr>
+    </tbody>
   </table>
 
   <button on:click={testConnection}>Test Connection</button>
@@ -195,23 +217,41 @@
 </Collapser>
 
 <style>
-  label {
-    display: block;
-    margin: 10px;
-  }
-
   button,
   p {
     margin: 10px;
   }
 
-  .delete-button {
-    padding: 0 10px;
+  .tbl-button {
+    padding: 5px 11px;
     margin: 0;
+    font-size: 15px;
   }
 
   .message p {
     padding: 10px;
     border-radius: 10px;
+  }
+
+  .subheader {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  hr {
+    color: #888;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  td input {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .key {
+    width: 30%;
   }
 </style>

@@ -75,7 +75,7 @@
     <button on:click={() => browser.runtime.openOptionsPage()} title={SETTINGS_TITLE}>
       <img class="img-icon" src={settingsIcon} alt="Settings" />
     </button>
-    <Toggle bind:booleanInput={intercept} title={TOGGLE_TITLE} />
+    <Toggle bind:booleanInput={intercept} title={TOGGLE_TITLE} button />
   </div>
 </header>
 

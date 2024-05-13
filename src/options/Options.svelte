@@ -3,6 +3,7 @@
   import ServerProp from './ServerProp.svelte';
   import Toggle from '../lib/Toggle.svelte';
   import { RPCs } from './store';
+  import './shared.css';
 
   let has_required_optional_perms = true;
   let has_all_perms = false;
@@ -156,7 +157,7 @@
       </div>
     </div>
   {:else}
-    <h1>Integrated Aria2 Options</h1>
+    <h1 class="center">Integrated Aria2 Options</h1>
     {#each $RPCs as cfg, i}
       <div class="server-cfg-container">
         <ServerProp rpcConfig={cfg} index={i} />
@@ -165,32 +166,33 @@
     <button on:click={addServer}>Add new Server</button>
 
     <h2>Global</h2>
+
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label>
       <!-- TODO: add warning -->
-      <input type="checkbox" bind:checked={sendCookies} />
       <span>Send Cookies</span>
       <Toggle bind:booleanInput={sendCookies} on:click={checkAllPerm} />
     </label>
 
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label>
-      <input type="checkbox" bind:checked={sendReferer} />
       <span>Send Referer</span>
       <Toggle bind:booleanInput={sendReferer} on:click={checkAllPerm} />
     </label>
 
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label>
-      <input type="checkbox" bind:checked={intercept} />
       <span>Intercept Download</span>
       <Toggle bind:booleanInput={intercept} />
     </label>
 
     <label>
-      <span>Progress Color:</span>
+      <span>Progress Color</span>
       <input type="text" bind:value={progressColor} />
     </label>
 
     <label>
-      <span>Progress Outline Color:</span>
+      <span>Progress Outline Color</span>
       <input type="text" bind:value={progressOutlineColor} />
     </label>
 
@@ -204,7 +206,8 @@
 
 <style>
   main {
-    max-width: 900px;
+    min-width: 800px;
+    max-width: 800px;
   }
 
   .yapping > p {
@@ -219,10 +222,6 @@
     margin: 20px 3em;
   }
 
-  label {
-    display: block;
-  }
-
   .server-cfg-container {
     padding: 5px;
     border: solid 1px var(--fg-color);
@@ -232,9 +231,5 @@
   .message p {
     padding: 10px;
     border-radius: 10px;
-  }
-
-  input[type='checkbox'] {
-    display: none;
   }
 </style>

@@ -1,0 +1,28 @@
+label {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  margin: 2px;
+}
+
+label span {
+  align-content: center;
+  font-size: 15px;
+}
+
+label input {
+  width: 45%;
+}
+
+label:focus-within:has(input[type='checkbox']) {
+  outline: solid 1px;
+  border-radius: 5px;
+}
+
+input {
+  border: none;
+  border-radius: 5px;
+  padding: 7px;
+  background-color: var(--bg-color-lighter);
+  font-size: 15px;
+}

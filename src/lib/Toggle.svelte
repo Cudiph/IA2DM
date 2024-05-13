@@ -1,21 +1,31 @@
 <script>
   export let booleanInput;
   export let title = '';
+  export let button = false;
 
   function toggleInput() {
     booleanInput = !booleanInput;
   }
 </script>
 
-<button class="toggle-button" on:click={toggleInput} {title}>
-  <div class="toggle" class:toggle-enabled={booleanInput} class:toggle-disabled={!booleanInput}>
-    <div class="circle"></div>
+{#if !button}
+  <div class="toggle-button">
+    <input type="checkbox" on:click bind:checked={booleanInput} />
+    <div class="toggle" class:toggle-enabled={booleanInput} class:toggle-disabled={!booleanInput}>
+      <div class="circle"></div>
+    </div>
   </div>
-</button>
+{:else}
+  <button class="toggle-button" on:click on:click={toggleInput} {title}>
+    <div class="toggle" class:toggle-enabled={booleanInput} class:toggle-disabled={!booleanInput}>
+      <div class="circle"></div>
+    </div>
+  </button>
+{/if}
 
 <style>
-  button:hover,
-  button:focus {
+  .toggle-button:hover,
+  .toggle-button:focus {
     background-color: var(--bg-color-hover);
   }
 
@@ -57,5 +67,19 @@
     margin: 0 5px;
     background-color: var(--bg-color);
     border-radius: 100%;
+  }
+
+  input[type='checkbox'] {
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+  }
+
+  .toggle-button:has(input) {
+    display: flex;
+    width: 44px;
   }
 </style>
