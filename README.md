@@ -3,6 +3,18 @@
   <h1>Integrated Aria2 Download Manager</h1></div>
 <br>
 
+## Screenshot
+
+<details>
+  <summary>Click to expand!</summary>
+  <br>
+
+![Popup 1](./misc/popup.png) ![Popup 2](./misc/popup2.png)
+![Error](./misc/download_error.png) ![Complete](./misc/download_complete.png)
+![options](./misc/options.png)
+
+</details>
+
 ## Features
 
 - Intercept download - Forward download from the browser to the aria2 instance.
@@ -17,12 +29,7 @@
 - Hotkey - keyboard shortcut is available
 - Fallback server - Add another server configuration as a fallback if the main
   one fail. Program will try to connect from top to bottom order in the options.
-
-## Known issue
-
-- In chromium based browser on windows, downloaded files will be saved in path
-  relative to working directory of aria2. Set `Save files to` in the quick
-  options to fix this issue.
+- Cross Browser - Works in both firefox or chromium based browsers.
 
 ## Guides
 
@@ -54,6 +61,14 @@
    `aria2c --enable-rpc --rpc-secret=topsecret --rpc-certificate=server.p12 --rpc-secure`
 
 </details>
+
+## Known issues
+
+- In chromium based browser on windows, downloaded files will be saved in path
+  relative to working directory of aria2. Set `Save files to` in the quick
+  options to fix this issue.
+- If you got `socket error` when using aria2 cli in Windows try adding
+  `--disable-ipv6` flag.
 
 ## Building
 
