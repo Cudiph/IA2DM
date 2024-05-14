@@ -130,4 +130,8 @@
     display: flex;
     align-items: center;
   }
+
+  .misc-action {
+    margin-right: 5px;
+  }
 </style>
