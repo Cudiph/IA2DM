@@ -190,8 +190,19 @@
   .root-container {
     max-width: 600px;
     min-width: 600px;
-    max-height: 400px;
     overflow-x: hidden;
+  }
+
+  @media screen and (min-width: 601px) {
+    .root-container {
+      max-width: 1000px;
+    }
+  }
+
+  @media screen and (max-height: 375px) {
+    .root-container {
+      max-height: 375px;
+    }
   }
 
   .item {

@@ -5,9 +5,9 @@
   import pauseIcon from '../assets/pause.svg';
   import trashIcon from '../assets/delete-sweep-outline.svg';
   import settingsIcon from '../assets/cog-outline.svg';
+  import dockIcon from '../assets/dock-window.svg';
   import browser from 'webextension-polyfill';
   import { wsConn, cfg } from './store';
-  import { page } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
 
   export let ws;
@@ -30,6 +30,15 @@
     const aria2json = getAria2JSON(cfg);
     wsConn.send(aria2json.purgeDownloadResult());
     browser.storage.local.set({ dlHistory: [] });
+  }
+
+  function handleDetachClick() {
+    browser.windows.create({
+      url: window.location.href,
+      type: 'popup',
+      width: 600,
+      height: 600,
+    });
   }
 
   $: {
@@ -72,6 +81,9 @@
     </div>
   </div>
   <div class="misc-action flex">
+    <button on:click={handleDetachClick}>
+      <img class="img-icon" src={dockIcon} alt="Detach" />
+    </button>
     <button on:click={() => browser.runtime.openOptionsPage()} title={SETTINGS_TITLE}>
       <img class="img-icon" src={settingsIcon} alt="Settings" />
     </button>
