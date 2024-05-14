@@ -130,44 +130,52 @@
       }
     }
   }
+
+  const TITLE_HOSTNAME = 'Value can hostname/IP Address/Domain name';
+  const TITLE_PORT = 'Port where aria2 is listening in range 1024-65535';
+  const TITLE_SECRET = 'RPC authorization secret token (keep empty if not set)';
+  const TITLE_SECURE = 'Connect to RPC using SSL/TLS (To setup self-signed certificate see README)';
+  const TITLE_SAVES_FILES_TO = 'Directory to save downloaded files';
+  const TITLE_USE_BROWSER_AGENT =
+    "Send this browser's user agent to download server instead of aria2 default";
 </script>
 
 <Collapser title={rpcConfig.name + ` #${index + 1}`} hide={!index ? false : true}>
-  <label title="sdfsdf">
+  <label>
     <span>Profile Name</span>
     <input type="text" bind:value={rpcConfig.name} />
   </label>
 
   <span class="subheader">Connection</span>
   <hr />
-  <label>
+  <label title={TITLE_HOSTNAME}>
     <span>RPC hostname/address</span>
     <input type="text" bind:value={rpcConfig.host} />
   </label>
-  <label>
+  <label title={TITLE_PORT}>
     <span>RPC Port</span>
     <input type="number" min="1000" max="65530" bind:value={rpcConfig.port} />
   </label>
-  <label>
+  <label title={TITLE_SECRET}>
     <span>RPC Secret</span>
     <input type="password" bind:value={rpcConfig.secret} />
   </label>
 
   <!-- svelte-ignore a11y-label-has-associated-control -->
-  <label>
+  <label title={TITLE_SECURE}>
     <span>Secure</span>
     <Toggle bind:booleanInput={rpcConfig.secure} />
   </label>
 
   <span class="subheader">Quick Options</span>
   <hr />
-  <label>
+  <label title={TITLE_SAVES_FILES_TO}>
     <span>Save files to</span>
     <input type="text" bind:value={saveDir} on:input={handleSaveTo} />
   </label>
 
   <!-- svelte-ignore a11y-label-has-associated-control -->
-  <label>
+  <label title={TITLE_USE_BROWSER_AGENT}>
     <span>Use browser user agent</span>
     <Toggle bind:booleanInput={useUserAgent} on:click={handleUseUserAgent} />
   </label>
@@ -200,6 +208,10 @@
         </td>
       </tr>
     </tbody>
+    <caption
+      ><a href="https://aria2.github.io/manual/en/html/aria2c.html#id2">Full options list</a
+      ></caption
+    >
   </table>
 
   <button on:click={testConnection}>Test Connection</button>
@@ -253,5 +265,9 @@
 
   .key {
     width: 30%;
+  }
+
+  caption {
+    caption-side: bottom;
   }
 </style>

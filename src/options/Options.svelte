@@ -113,6 +113,14 @@
     progressColor = progressColor.trim();
     progressOutlineColor = progressOutlineColor.trim();
   }
+
+  const TITLE_COOKIES =
+    'Send website cookies to download server in case server has authorization such as login/captcha/cookie tracker.';
+  const TITLE_REFERER = 'Send referer header to download server. (disable if it make things worse)';
+  const TITLE_INTERCEPT_DOWNLOAD =
+    'Forward download made from built in browser download manager to aria2';
+  const TITLE_PROGRESS_COLOR = 'Set progress color in CSS color format';
+  const TITLE_OUTLINE_COLOR = 'Set outline color in CSS color format';
 </script>
 
 <main>
@@ -168,30 +176,30 @@
     <h2>Global</h2>
 
     <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label>
+    <label title={TITLE_COOKIES}>
       <!-- TODO: add warning -->
       <span>Send Cookies</span>
       <Toggle bind:booleanInput={sendCookies} on:click={checkAllPerm} />
     </label>
 
     <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label>
+    <label title={TITLE_REFERER}>
       <span>Send Referer</span>
       <Toggle bind:booleanInput={sendReferer} on:click={checkAllPerm} />
     </label>
 
     <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label>
+    <label title={TITLE_INTERCEPT_DOWNLOAD}>
       <span>Intercept Download</span>
       <Toggle bind:booleanInput={intercept} />
     </label>
 
-    <label>
+    <label title={TITLE_PROGRESS_COLOR}>
       <span>Progress Color</span>
       <input type="text" bind:value={progressColor} />
     </label>
 
-    <label>
+    <label title={TITLE_OUTLINE_COLOR}>
       <span>Progress Outline Color</span>
       <input type="text" bind:value={progressOutlineColor} />
     </label>
