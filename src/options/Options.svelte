@@ -177,10 +177,20 @@
 
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label title={TITLE_COOKIES}>
-      <!-- TODO: add warning -->
       <span>Send Cookies</span>
       <Toggle bind:booleanInput={sendCookies} on:click={checkAllPerm} />
     </label>
+    {#if sendCookies}
+      <div class="message">
+        <p class="warning">
+          Cookies is very sensitive data, using at least self-signed SSL/TLS certificate and enable
+          secure option is highly reccomended <a href="https://github.com/Cudiph/IA2DM#guides"
+            >See the guides</a
+          >. If you're sure that your RPC traffic is not being monitored or your aria2 is hosted
+          locally you can ignore this warning.
+        </p>
+      </div>
+    {/if}
 
     <!-- svelte-ignore a11y-label-has-associated-control -->
     <label title={TITLE_REFERER}>

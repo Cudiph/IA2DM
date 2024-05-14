@@ -20,9 +20,40 @@
 
 ## Known issue
 
-Edge case and error handling is not tested yet, but the list are:
+- In chromium based browser on windows, downloaded files will be saved in path
+  relative to working directory of aria2. Set `Save files to` in the quick
+  options to fix this issue.
 
-- no technical issue found yet except some UI mess when given unexpected data.
+## Guides
+
+<details>
+  <summary>Setup self-signed ssl/tls certificate in firefox</summary>
+  <br>
+
+1. Run `genssl.sh` script in the `scripts` folder to generate certificates.
+2. Add `root-ca.pem` to Authorities in certificate manager (search for "view
+   certificates" in the firefox settings) and check
+   `This certificate can identify website` when importing
+3. If still not work, try disabling
+   `security.certerrors.mitm.auto_enable_enterprise_roots` and
+   `security.enterprise_roots.enabled` in `about:config`
+4. Finally run
+   `aria2c --enable-rpc --rpc-secret=topsecret --rpc-certificate=server.p12 --rpc-secure`
+
+</details>
+
+<details>
+  <summary>Setup self-signed ssl/tls certificate in chromium</summary>
+  <br>
+
+1. Run `genssl.sh` script in the `scripts` folder to generate certificates.
+2. Add `root-ca.pem` to Authorities tab in Manage certificates (search for
+   "manage certificates" in the search bar) and check
+   `Trust this certificate for identifying websites` when importing
+3. Finally run
+   `aria2c --enable-rpc --rpc-secret=topsecret --rpc-certificate=server.p12 --rpc-secure`
+
+</details>
 
 ## Building
 

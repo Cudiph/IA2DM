@@ -116,7 +116,7 @@ browser.downloads.onCreated.addListener(async (item) => {
 function initInterval(cfg) {
   /** @type {any} */
   const aria2json = getAria2JSON(cfg, { id: 'intervalRequest' });
-   const progressInterval = setInterval(() => {
+  const progressInterval = setInterval(() => {
     wsConn.send(
       `[${aria2json.tellActive(['totalLength', 'completedLength'])},${aria2json.tellWaiting(
         0,
@@ -128,9 +128,9 @@ function initInterval(cfg) {
 
   const downloadEndInterval = setInterval(() => {
     onDownloadEnd(cfg);
-  }, 10000)
-  
-  intervalIDs.push(progressInterval, downloadEndInterval)
+  }, 10000);
+
+  intervalIDs.push(progressInterval, downloadEndInterval);
 }
 
 function finiInterval() {
