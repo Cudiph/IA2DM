@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# custom
+test.*
+*.pem
+*.pfx
+*.key
+*.srl
+*.p12
