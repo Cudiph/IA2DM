@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { getAria2Batch, getAria2JSON, getAria2OOP } from './lib/aria2rpc.js';
+import { getAria2JSON, getAria2OOP } from './lib/aria2rpc.js';
 import { gen_checklist_icon, gen_progress_icon, resetActionIcon } from './lib/graphics.js';
 import {
   check_connection,
@@ -13,7 +13,7 @@ const bslocal = browser.storage.local;
 const dl = browser.downloads;
 /** @type {WebSocket} */
 let wsConn = null;
-let intervalID = null;
+let intervalIDs = [];
 let holdCompleteIcon = false;
 let badgeTimeoutID = null;
 
@@ -116,7 +116,7 @@ browser.downloads.onCreated.addListener(async (item) => {
 function initInterval(cfg) {
   /** @type {any} */
   const aria2json = getAria2JSON(cfg, { id: 'intervalRequest' });
-  return setInterval(() => {
+   const progressInterval = setInterval(() => {
     wsConn.send(
       `[${aria2json.tellActive(['totalLength', 'completedLength'])},${aria2json.tellWaiting(
         0,
@@ -125,12 +125,19 @@ function initInterval(cfg) {
       )}]`
     );
   }, 2000);
+
+  const downloadEndInterval = setInterval(() => {
+    onDownloadEnd(cfg);
+  }, 10000)
+  
+  intervalIDs.push(progressInterval, downloadEndInterval)
 }
 
 function finiInterval() {
-  clearInterval(intervalID);
-  intervalID = null;
-  wsConn = null;
+  for (const id of intervalIDs) {
+    clearInterval(id);
+  }
+  intervalIDs = [];
 }
 
 /** @param {jsonRPCResponse[]} data */
@@ -260,7 +267,7 @@ function connectWebsocket(cfg) {
   wsConn = new WebSocket(uri);
 
   wsConn.onopen = (_) => {
-    intervalID = initInterval(cfg);
+    initInterval(cfg);
   };
 
   // for websocket when sending a message, the request should be in array
@@ -292,6 +299,7 @@ function connectWebsocket(cfg) {
     setTimeout(() => {
       resetActionIcon();
     }, 3000);
+    wsConn = null;
   };
 }
 

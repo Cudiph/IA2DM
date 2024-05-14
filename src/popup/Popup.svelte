@@ -52,7 +52,7 @@
   }
 
   function finiIntervalPolling() {
-    intervalID && clearInterval(intervalID);
+    clearInterval(intervalID);
     intervalID = null;
     ws = null;
   }
