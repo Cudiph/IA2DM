@@ -1,6 +1,7 @@
 <div align="center">
   <img src="./public/images/icon.png" alt="logo">
-  <h1>Integrated Aria2 Download Manager</h1></div>
+  <h1>Integrated Aria2 Download Manager</h1>
+</div>
 <br>
 
 ## Screenshot
@@ -29,7 +30,7 @@
 - Hotkey - keyboard shortcut is available
 - Fallback server - Add another server configuration as a fallback if the main
   one fail. Program will try to connect from top to bottom order in the options.
-- Cross Browser - Works in both firefox or chromium based browsers.
+- Cross Browser - Works on both firefox or chromium based browsers.
 
 ## Guides
 
@@ -79,6 +80,12 @@
 
 `dist` folder will be generated in the root of the project directory with
 `firefox` and `chromium` folder inside.
+
+## Translation
+
+Currently no plan for it since it's just fun little project for me to solve my
+own problem but let's see if userbase is growing or tell me if you need it I'll
+make the abstraction for the translator.
 
 ## Contributing and feature request
 
