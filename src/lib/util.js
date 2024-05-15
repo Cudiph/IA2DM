@@ -54,6 +54,7 @@ export function resetConfig() {
     sendReferer: false,
     progressColor: '#ffaaff',
     progressOutlineColor: '#999999',
+    lastError: '',
   };
   browser.storage.local.set(initConfig);
 }

@@ -84,7 +84,6 @@ browser.downloads.onCreated.addListener(async (item) => {
   /** @type {activeDownloadItem} */
   let download_obj;
   try {
-    // throw Error("dsfs");;
     const res = await aria2.addUri([item.url], rpcOnlineCfg.options);
     const resjson = await res.json();
 
@@ -97,7 +96,7 @@ browser.downloads.onCreated.addListener(async (item) => {
     };
     activeDownload[resjson.result] = download_obj;
   } catch (e) {
-    // TODO: tell user about the error
+    bslocal.set({ lastError: e.toString() });
     console.error(e);
     return;
   }

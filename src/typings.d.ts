@@ -81,6 +81,7 @@ interface aria2Storage {
   sendReferer: boolean;
   progressColor: string; // use it as accent color?
   progressOutlineColor: string;
+  lastError: string;
 }
 
 // Notification or request

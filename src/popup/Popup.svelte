@@ -13,8 +13,10 @@
 
   let activeDownloadList = [];
   let dlHistory = [];
-  browser.storage.local.get('dlHistory').then((res) => {
+  let lastError = '';
+  browser.storage.local.get(['dlHistory', 'lastError']).then((res) => {
     dlHistory = res.dlHistory;
+    lastError = res.lastError;
   });
 
   let has_required_optional_perms = true;
@@ -151,11 +153,25 @@
       tryReconnect();
     });
   }
+
+  function clearError() {
+    browser.storage.local.set({ lastError: '' });
+    lastError = '';
+  }
+
   initWebSocket();
 </script>
 
 <div class="root-container">
-  {#if $page === '#add'}
+  {#if lastError}
+    <div class="notif message">
+      <p class="failed">
+        There was an error. <b>{lastError}</b><br />
+        Download has been returned to browser if possible.
+      </p>
+      <button on:click={clearError}>OK</button>
+    </div>
+  {:else if $page === '#add'}
     <Add />
   {:else if $page === '#item-detail'}
     <DownloadDetail />
@@ -182,7 +198,6 @@
         {/if}
       {/if}
     </main>
-    <!-- <Footer /> -->
   {/if}
 </div>
 
@@ -215,5 +230,10 @@
 
   .notif {
     text-align: center;
+  }
+
+  .message p {
+    padding: 10px;
+    border-radius: 10px;
   }
 </style>
