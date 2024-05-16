@@ -1,6 +1,7 @@
 <div align="center">
   <img src="./public/images/icon.png" alt="logo">
   <h1>Integrated Aria2 Download Manager</h1>
+  <a href="https://addons.mozilla.org/firefox/addon/ia2dm/"><img height="60" src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" alt="Get IA2DM for Firefox" /></a>
 </div>
 <br>
 
