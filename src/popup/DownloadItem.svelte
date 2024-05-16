@@ -65,11 +65,11 @@
     location.hash = '#item-detail';
   }
 
-  const TITLE_PAUSE = "Pause this download"
-  const TITLE_RESUME = "Resume this download"
-  const TITLE_STOP = "Stop seeding"
-  const TITLE_CLEAR = "Clear this download from history"
-  const TITLE_DELETE = "Delete/cancel this download"
+  const TITLE_PAUSE = 'Pause this download';
+  const TITLE_RESUME = 'Resume this download';
+  const TITLE_STOP = 'Stop seeding';
+  const TITLE_CLEAR = 'Clear this download from history';
+  const TITLE_DELETE = 'Delete/cancel this download';
 </script>
 
 <div class="container">
