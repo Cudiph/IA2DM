@@ -71,6 +71,8 @@
   options to fix this issue.
 - If you got `socket error` when using aria2 cli in Windows try adding
   `--disable-ipv6` flag.
+- For SSL certificate error when downloading, try adding
+  `--check-certificate=false` flag.
 
 ## Building
 
