@@ -64,6 +64,12 @@
     $selectedItem = item;
     location.hash = '#item-detail';
   }
+
+  const TITLE_PAUSE = "Pause this download"
+  const TITLE_RESUME = "Resume this download"
+  const TITLE_STOP = "Stop seeding"
+  const TITLE_CLEAR = "Clear this download from history"
+  const TITLE_DELETE = "Delete/cancel this download"
 </script>
 
 <div class="container">
@@ -127,21 +133,21 @@
   </div>
   <div class="control">
     {#if item.status === 'paused'}
-      <button on:click={handleResumeClick}>
-        <img class="img-icon" src={resumeIcon} alt="resume" />
+      <button on:click={handleResumeClick} title={TITLE_RESUME}>
+        <img class="img-icon" src={resumeIcon} alt="Resume" />
       </button>
     {:else if item.status === 'active'}
-      <button on:click={handlePauseClick}>
-        <img class="img-icon" src={pauseIcon} alt="pause" />
+      <button on:click={handlePauseClick} title={TITLE_PAUSE}>
+        <img class="img-icon" src={pauseIcon} alt="Pause" />
       </button>
     {/if}
     {#if item.status === 'paused' || item.status === 'active'}
-      <button on:click={handleRemoveClick}>
-        <img class="img-icon" src={item.seeder ? stopIcon : xIcon} alt="delete" />
+      <button on:click={handleRemoveClick} title={item.seeder ? TITLE_STOP : TITLE_DELETE}>
+        <img class="img-icon" src={item.seeder ? stopIcon : xIcon} alt="Delete" />
       </button>
     {:else}
-      <button on:click={handleClearClick}>
-        <img class="img-icon" src={clearIcon} alt="delete" />
+      <button on:click={handleClearClick} title={TITLE_CLEAR}>
+        <img class="img-icon" src={clearIcon} alt="Clear" />
       </button>
     {/if}
   </div>
