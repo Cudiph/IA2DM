@@ -10,6 +10,7 @@ import {
 } from './lib/util.js';
 
 const bslocal = browser.storage.local;
+const bsession = browser.storage.session;
 const dl = browser.downloads;
 /** @type {WebSocket} */
 let wsConn = null;
@@ -32,13 +33,13 @@ browser.runtime.onInstalled.addListener(async ({ reason }) => {
 
 // intercept start here
 browser.downloads.onCreated.addListener(async (item) => {
-  const { intercept, activeDownload, sendCookies, sendReferer, RPCs } = await bslocal.get([
+  const { intercept, sendCookies, sendReferer, RPCs } = await bslocal.get([
     'intercept',
-    'activeDownload',
     'sendCookies',
     'sendReferer',
     'RPCs',
   ]);
+  const { activeDownload = {} } = await bsession.get('activeDownload');
 
   if (!intercept) {
     dl.resume(item.id);
@@ -106,7 +107,7 @@ browser.downloads.onCreated.addListener(async (item) => {
   dl.erase({ id: item.id });
 
   // add to activeDownload list
-  bslocal.set({ activeDownload });
+  bsession.set({ activeDownload });
 });
 
 /**
@@ -187,7 +188,8 @@ async function onDownloadEndResponseHandler(data) {
  * @param {jsonRPCPayload} data
  */
 async function moveToDLHistory(cfg, data) {
-  const { activeDownload, dlHistory } = await bslocal.get(['activeDownload', 'dlHistory']);
+  const { dlHistory } = await bslocal.get(['dlHistory']);
+  const { activeDownload = {} } = await bsession.get(['activeDownload']);
   const aria2 = getAria2OOP(cfg);
   const status = data.method.split('load').pop();
   switch (status) {
@@ -255,7 +257,8 @@ async function moveToDLHistory(cfg, data) {
     dlHistory.unshift(activeDlCache);
     delete activeDownload[i.gid];
   }
-  bslocal.set({ activeDownload, dlHistory });
+  bslocal.set({ dlHistory });
+  bsession.set({ activeDownload });
 }
 
 /** @param {RPCConfig} cfg */
@@ -328,4 +331,9 @@ browser.commands.onCommand.addListener(async (cmd) => {
       }, 3000);
     });
   }
+});
+
+// init session storage
+bsession.get('activeDownload').then((res) => {
+  if (!res.activeDownload) bsession.set({ activeDownload: {} });
 });

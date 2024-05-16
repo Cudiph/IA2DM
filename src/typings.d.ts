@@ -75,13 +75,19 @@ interface DownloadItem {
 interface aria2Storage {
   RPCs: RPCConfig[]; // list of RPC config
   intercept: boolean;
-  activeDownload: activeDownload_t; // temporary active download list
   dlHistory: DownloadItem[]; // saved history
   sendCookies: boolean;
   sendReferer: boolean;
   progressColor: string; // use it as accent color?
   progressOutlineColor: string;
   lastError: string;
+  dirList: string[];
+  addPageLastDir: string;
+}
+
+// Session storage
+interface aria2SessionStorage {
+  activeDownload: activeDownload_t; // temporary active download list
 }
 
 // Notification or request

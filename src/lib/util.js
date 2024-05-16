@@ -48,15 +48,17 @@ export function resetConfig() {
         options: {},
       },
     ],
-    activeDownload: {},
     dlHistory: [],
     sendCookies: false,
     sendReferer: false,
     progressColor: '#ffaaff',
     progressOutlineColor: '#999999',
     lastError: '',
+    dirList: [],
+    addPageLastDir: '',
   };
   browser.storage.local.set(initConfig);
+  browser.storage.session.set({ activeDownload: {} });
 }
 
 /** get the best string representasion of bytes

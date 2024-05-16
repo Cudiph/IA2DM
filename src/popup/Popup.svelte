@@ -66,7 +66,7 @@
     if (data[0].id !== 'popupIntervalPolling') return;
     let newActiveDownloads = [];
 
-    const { activeDownload } = await browser.storage.local.get('activeDownload');
+    const { activeDownload = {} } = await browser.storage.session.get('activeDownload');
     for (const res of data) {
       for (const item of res.result) {
         const folderName = getFolderName(item.dir, item.files[0].path);
@@ -97,7 +97,7 @@
           numSeeders: parseInt(item.numSeeders),
           filesize: parseInt(item.totalLength),
           serverName: saved?.serverName || '',
-          startTime: saved?.startTime,
+          startTime: saved?.startTime || 0,
           finishTime: 0,
           errorMsg: item.errorMessage,
           infoHash: item.infoHash,
