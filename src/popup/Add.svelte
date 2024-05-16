@@ -9,6 +9,13 @@
   let success = false;
   let files;
   let ext = '';
+  let dir = '';
+  let dirList = [];
+
+  browser.storage.local.get(['dirList', 'addPageLastDir']).then((res) => {
+    dir = res.addPageLastDir || '';
+    dirList = res.dirList || [];
+  });
 
   getWSConn().then((res) => {
     anyConnection = res;
@@ -28,6 +35,8 @@
 
   async function addNewDownloadHandler() {
     const aria2 = getAria2OOP(cfg);
+
+    if (dir) cfg.options.dir = dir;
 
     if (files?.length) {
       try {
@@ -99,6 +108,8 @@
   } else if (files?.length) {
     ext = getExtension(files[0].name);
   }
+
+  $: browser.storage.local.set({ addPageLastDir: dir });
 </script>
 
 <div class="container">
@@ -110,6 +121,21 @@
     <label>
       Or use metalink/torrent file:
       <input type="file" accept=".torrent, .metalink" bind:files multiple />
+    </label>
+    <label>
+      Save files to:
+      <input type="text" bind:value={dir} />
+      <select
+        class:hide={!dirList.length}
+        on:change={(e) => {
+          dir = e.target.value;
+        }}
+      >
+        <option value="" disabled selected>Quick directory selection</option>
+        {#each dirList as d}
+          <option value={d}>{d}</option>
+        {/each}
+      </select>
     </label>
     <div class="msg">
       {#if success}
@@ -128,6 +154,10 @@
 <style>
   .container {
     margin: 3px 10px;
+  }
+
+  label {
+    display: block;
   }
 
   textarea {

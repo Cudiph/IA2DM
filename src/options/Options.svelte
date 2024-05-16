@@ -2,8 +2,10 @@
   import browser from 'webextension-polyfill';
   import ServerProp from './ServerProp.svelte';
   import Toggle from '../lib/Toggle.svelte';
+  import DirList from './DirList.svelte';
   import { RPCs } from './store';
   import './shared.css';
+  import { resetConfig } from '../lib/util';
 
   let has_required_optional_perms = true;
   let has_all_perms = false;
@@ -109,6 +111,13 @@
     }, 4000);
   }
 
+  function reset() {
+    if (confirm('This will reset all configuration and deleting all download history. Proceed?')) {
+      resetConfig();
+      window.location.reload();
+    }
+  }
+
   $: {
     progressColor = progressColor.trim();
     progressOutlineColor = progressOutlineColor.trim();
@@ -121,6 +130,8 @@
     'Forward download made from built in browser download manager to aria2';
   const TITLE_PROGRESS_COLOR = 'Set progress color in CSS color format';
   const TITLE_OUTLINE_COLOR = 'Set outline color in CSS color format';
+  const TITLE_RESET =
+    'Reset all data stored in the storage in case the UI accessing undefined property';
 </script>
 
 <main>
@@ -166,6 +177,7 @@
     </div>
   {:else}
     <h1 class="center">Integrated Aria2 Options</h1>
+    <pre>Tips: Hover over the option name for more information</pre>
     {#each $RPCs as cfg, i}
       <div class="server-cfg-container">
         <ServerProp rpcConfig={cfg} index={i} />
@@ -219,6 +231,9 @@
       <p class="hide failed">Failed to save configuration. Reason:<br /> `{errorMsg}`</p>
     </div>
     <button on:click={saveConfiguration}>Save Configuration</button>
+    <button on:click={reset} title={TITLE_RESET}>Reset Storage</button>
+
+    <DirList />
   {/if}
 </main>
 
