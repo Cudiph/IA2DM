@@ -82,14 +82,14 @@
       }
       success = true;
       const gid = resjson.result;
-      const { activeDownload } = await browser.storage.local.get('activeDownload');
+      const { activeDownload = {} } = await browser.storage.session.get('activeDownload');
       activeDownload[gid] = {
         gid,
         url: input,
         serverName: cfg.name,
         startTime: +new Date(),
       };
-      browser.storage.local.set({ activeDownload });
+      browser.storage.session.set({ activeDownload });
       setTimeout(() => {
         location.hash = '#main';
       }, 1000);
@@ -131,7 +131,7 @@
           dir = e.target.value;
         }}
       >
-        <option value="" disabled selected>Quick directory selection</option>
+        <option value="" disabled selected>--Quick directory selection--</option>
         {#each dirList as d}
           <option value={d}>{d}</option>
         {/each}
