@@ -9,7 +9,10 @@
   export let rpcConfig;
   export let index = 0;
   let useUserAgent = rpcConfig.options['user-agent'] || false;
-  let saveDir = rpcConfig.options.dir || '';
+  let quickTableForTextInput = {
+    dir: rpcConfig.options.dir || '',
+    'max-download-limit': rpcConfig.options['max-download-limit'] || '',
+  };
 
   let timeoutID = null;
   let test = '';
@@ -20,11 +23,15 @@
     optionValue.push(rpcConfig.options[k]);
   }
 
+  // process the table
   $: {
+    // set at least one row when nothing in the options
     if (!optionKey.length) {
       optionKey = [''];
       optionValue = [''];
     }
+
+    // commit changes
     rpcConfig.options = {};
     for (let i = 0; i < optionKey.length; i++) {
       const key = optionKey[i];
@@ -43,12 +50,12 @@
     useUserAgent = !useUserAgent;
   }
 
-  function handleSaveTo() {
-    if (!saveDir) {
-      tableRemove('dir');
-      return;
+  /** @param {string} key */
+  function handleInputQuickOptions(key) {
+    if (!quickTableForTextInput[key]) {
+      tableRemove(key);
     }
-    tableAssign('dir', saveDir);
+    tableAssign(key, quickTableForTextInput[key]);
   }
 
   function deleteConfig() {
@@ -82,6 +89,7 @@
     optionValue = [...optionValue, ''];
   }
 
+  /** @param {number} idx */
   function removeByIndex(idx) {
     optionKey.splice(idx, 1);
     optionValue.splice(idx, 1);
@@ -138,6 +146,7 @@
   const TITLE_SAVES_FILES_TO = 'Directory to save downloaded files';
   const TITLE_USE_BROWSER_AGENT =
     "Send this browser's user agent to download server instead of aria2 default";
+  const TITLE_MAX_DLSPEED = '(1K = 1024, 1M = 1024K) "0" means unrestricted';
 </script>
 
 <Collapser title={rpcConfig.name + ` #${index + 1}`} hide={!index ? false : true}>
@@ -171,7 +180,20 @@
   <hr />
   <label title={TITLE_SAVES_FILES_TO}>
     <span>Save files to</span>
-    <input type="text" bind:value={saveDir} on:input={handleSaveTo} />
+    <input
+      type="text"
+      bind:value={quickTableForTextInput.dir}
+      on:input={(_) => handleInputQuickOptions('dir')}
+    />
+  </label>
+
+  <label title={TITLE_MAX_DLSPEED}>
+    <span>Max download speed</span>
+    <input
+      type="text"
+      bind:value={quickTableForTextInput['max-download-limit']}
+      on:input={(_) => handleInputQuickOptions('max-download-limit')}
+    />
   </label>
 
   <!-- svelte-ignore a11y-label-has-associated-control -->
