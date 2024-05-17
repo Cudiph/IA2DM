@@ -64,6 +64,17 @@
 
 </details>
 
+<details>
+  <summary>Import certificate in windows</summary>
+  <br>
+
+1. Run `$ cat genssl.sh | tr -d '\r' | sh -` using WSL then rename the generated
+   `root-ca.pem` to `root-ca.cer`, double click the file and install certificate.
+2. Store to Local Machine, next, and place the certificate in
+   "Trusted Root Certification Authorities" folder.
+
+</details>
+
 ## Known issues
 
 - In chromium based browser on windows, downloaded files will be saved in path
