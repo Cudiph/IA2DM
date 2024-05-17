@@ -33,13 +33,13 @@ browser.runtime.onInstalled.addListener(async ({ reason }) => {
 
 // intercept start here
 browser.downloads.onCreated.addListener(async (item) => {
-  const { intercept, sendCookies, sendReferer, RPCs, aria2DecideFilename = false } = await bslocal.get([
-    'intercept',
-    'sendCookies',
-    'sendReferer',
-    'RPCs',
-    'aria2DecideFilename'
-  ]);
+  const {
+    intercept,
+    sendCookies,
+    sendReferer,
+    RPCs,
+    aria2DecideFilename = false,
+  } = await bslocal.get(['intercept', 'sendCookies', 'sendReferer', 'RPCs', 'aria2DecideFilename']);
   const { activeDownload = {} } = await bsession.get('activeDownload');
 
   if (!intercept) {
