@@ -78,6 +78,7 @@ interface aria2Storage {
   dlHistory: DownloadItem[]; // saved history
   sendCookies: boolean;
   sendReferer: boolean;
+  aria2DecideFilename: boolean;
   progressColor: string; // use it as accent color?
   progressOutlineColor: string;
   lastError: string;

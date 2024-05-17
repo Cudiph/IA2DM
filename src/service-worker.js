@@ -33,11 +33,12 @@ browser.runtime.onInstalled.addListener(async ({ reason }) => {
 
 // intercept start here
 browser.downloads.onCreated.addListener(async (item) => {
-  const { intercept, sendCookies, sendReferer, RPCs } = await bslocal.get([
+  const { intercept, sendCookies, sendReferer, RPCs, aria2DecideFilename = false } = await bslocal.get([
     'intercept',
     'sendCookies',
     'sendReferer',
     'RPCs',
+    'aria2DecideFilename'
   ]);
   const { activeDownload = {} } = await bsession.get('activeDownload');
 
@@ -61,7 +62,7 @@ browser.downloads.onCreated.addListener(async (item) => {
 
   const [dirname, basename] = getDirnameBasename(item.filename);
   if (!rpcOnlineCfg.options.dir) rpcOnlineCfg.options.dir = dirname;
-  rpcOnlineCfg.options.out = basename;
+  if (!aria2DecideFilename) rpcOnlineCfg.options.out = basename;
 
   // forward referer to aria2
   // startwith prevent about:blank to be set

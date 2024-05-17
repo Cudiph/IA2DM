@@ -56,6 +56,7 @@ export function resetConfig() {
     lastError: '',
     dirList: [],
     addPageLastDir: '',
+    aria2DecideFilename: false,
   };
   browser.storage.local.set(initConfig);
   browser.storage.session.set({ activeDownload: {} });

@@ -12,6 +12,7 @@
   let intercept = false;
   let sendCookies = false;
   let sendReferer = false;
+  let aria2DecideFilename = false;
   let progressColor = '';
   let progressOutlineColor = '';
   let timer = null;
@@ -60,6 +61,7 @@
       $RPCs = res.RPCs;
       sendCookies = res.sendCookies;
       sendReferer = res.sendReferer;
+      aria2DecideFilename = res.aria2DecideFilename || false;
       intercept = res.intercept;
       progressColor = res.progressColor;
       progressOutlineColor = res.progressOutlineColor;
@@ -94,6 +96,7 @@
         RPCs: $RPCs,
         progressColor,
         progressOutlineColor,
+        aria2DecideFilename,
       });
       saveMsgElem.firstChild.classList.remove('hide');
     } catch (e) {
@@ -132,6 +135,7 @@
   const TITLE_OUTLINE_COLOR = 'Set outline color in CSS color format';
   const TITLE_RESET =
     'Reset all data stored in the storage in case the UI accessing undefined property';
+  const TITLE_ARIA2DECIDEFILENAME = `Use browser given filename if disabled. Enable if aria2 won't continue download because of different name`;
 </script>
 
 <main>
@@ -214,6 +218,12 @@
     <label title={TITLE_INTERCEPT_DOWNLOAD}>
       <span>Intercept Download</span>
       <Toggle bind:booleanInput={intercept} />
+    </label>
+
+    <!-- svelte-ignore a11y-label-has-associated-control -->
+    <label title={TITLE_ARIA2DECIDEFILENAME}>
+      <span>Let aria2 decide the downloaded filename</span>
+      <Toggle bind:booleanInput={aria2DecideFilename} />
     </label>
 
     <label title={TITLE_PROGRESS_COLOR}>
