@@ -2,6 +2,8 @@
   <img src="./public/images/icon.png" alt="logo">
   <h1>Integrated Aria2 Download Manager</h1>
   <a href="https://addons.mozilla.org/firefox/addon/ia2dm/"><img height="60" src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" alt="Get IA2DM for Firefox" /></a>
+  </a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/nfchpjolcepnhnmbpigllmahoaecdmlj"><img height="62" src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get IA2DM for Edge"></a>
 </div>
 <br>
 
