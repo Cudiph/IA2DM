@@ -61,8 +61,8 @@ browser.downloads.onCreated.addListener(async (item) => {
   connectWebsocket(rpcOnlineCfg);
 
   const [dirname, basename] = getDirnameBasename(item.filename);
-  if (!rpcOnlineCfg.options.dir) rpcOnlineCfg.options.dir = dirname;
-  if (!aria2DecideFilename) rpcOnlineCfg.options.out = basename;
+  if (!rpcOnlineCfg.options.dir && dirname) rpcOnlineCfg.options.dir = dirname;
+  if (!aria2DecideFilename && basename) rpcOnlineCfg.options.out = basename;
 
   // forward referer to aria2
   // startwith prevent about:blank to be set

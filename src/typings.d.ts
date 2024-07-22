@@ -4,6 +4,7 @@ type aria2_status = 'active' | 'waiting' | 'paused' | 'error' | 'complete' | 're
 
 type option_t = {
   [key: string]: string;
+  header: string[]
 };
 
 // using gid as the key
