@@ -147,7 +147,10 @@
     <button on:click={addNewDownloadHandler}>Add {ext}</button>
     <button on:click={(_) => (location.hash = '#main')}>cancel</button>
   {:else}
-    <h1>Not connected to any aria2 instance</h1>
+    <div class="center">
+      <h1>Not connected to any aria2 instance</h1>
+      <button on:click={() => (location.hash = '#main')}>OK</button>
+    </div>
   {/if}
 </div>
 
@@ -165,5 +168,13 @@
     resize: vertical;
     width: 100%;
     height: 100px;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .center button {
+    margin-bottom: 20px;
   }
 </style>
