@@ -1,14 +1,10 @@
 import { readable, writable } from 'svelte/store';
 import browser from 'webextension-polyfill';
-import { check_connection } from '../lib/util';
+import { Aria2Tray } from '../lib/aria2tray';
+import { check_connection, wsRpcFetch } from '../lib/util';
 
-// the let variables is to use only in event callback so they're already assigned when called
-/** @type {WebSocket} */
-export let wsConn = null;
+// ============== UI ==================
 
-/** @type {RPCConfig} */
-
-export let cfg = null;
 /** @type {page} */
 export let page = readable(window.location.hash, (set) => {
   function hashChangeHandler() {
@@ -30,30 +26,96 @@ export let selectedItem = writable({
   basename: '#0',
   status: 'waiting',
 });
+
 export let storageCache = writable({
   progressColor: '#ffaaff',
   progressOutlineColor: '#999',
 });
 
-export async function getWSConn() {
-  if (wsConn) return wsConn;
-  const { RPCs, progressColor, progressOutlineColor } = await browser.storage.local.get([
-    'RPCs',
-    'progressColor',
-    'progressOutlineColor',
-  ]);
-  const onlineIdx = await check_connection(RPCs);
+// ============ IPC  =============
 
-  if (onlineIdx === -1) return null;
+/** @type {RPCConfig} */
+export let cfg = null;
 
-  cfg = RPCs[onlineIdx];
-  storageCache.set({ progressColor, progressOutlineColor });
-  const uri = `ws${cfg.secure ? 's' : ''}://${cfg.host}:${cfg.port}/jsonrpc`;
-  wsConn = new WebSocket(uri);
-  wsConn.addEventListener('close', () => {
-    wsConn = null;
-  });
-  return wsConn;
+/** @type {import('svelte/store').Readable<WebSocket>} */
+export let aria2WS = readable(null, function start(set, update) {
+  function retry() {
+    setTimeout(() => {
+      init();
+    }, 3000);
+  }
+
+  async function init() {
+    const { RPCs, progressColor, progressOutlineColor } = await browser.storage.local.get([
+      'RPCs',
+      'progressColor',
+      'progressOutlineColor',
+    ]);
+
+    const onlineIdx = await check_connection(RPCs);
+
+    if (onlineIdx === -1) {
+      set(null);
+      retry();
+      return;
+    }
+
+    cfg = RPCs[onlineIdx];
+    storageCache.set({ progressColor, progressOutlineColor });
+    const uri = `ws${cfg.secure ? 's' : ''}://${cfg.host}:${cfg.port}/jsonrpc`;
+    const ws = new WebSocket(uri);
+    ws.addEventListener('open', async () => {
+      set(ws);
+    });
+
+    ws.addEventListener('close', () => {
+      set(null);
+      retry();
+    });
+  }
+
+  init();
+});
+
+/** @type {import('svelte/store').Readable<WebSocket>} */
+export let integrationWS = readable(null, function start(set) {
+  function retry() {
+    setTimeout(() => {
+      init();
+    }, 3000);
+  }
+
+  function init() {
+    const ws = new WebSocket('ws://127.0.0.1:31795');
+
+    ws.addEventListener('open', async () => {
+      const { RPCs } = await browser.storage.local.get(['RPCs']);
+      for (const rpcCfg of RPCs) {
+        const secret = rpcCfg.secret;
+        const a2t = new Aria2Tray(secret);
+        const res = await wsRpcFetch(ws, a2t.version('id_c'));
+        if (res.result) {
+          set(ws);
+          setIntegrationPass(secret);
+          break;
+        }
+      }
+    });
+
+    ws.addEventListener('close', () => {
+      set(null);
+      retry();
+    });
+  }
+
+  init();
+});
+
+let integrationPassword = '';
+/** @param {string} val */
+export function setIntegrationPass(val) {
+  integrationPassword = val;
 }
-
-getWSConn();
+export function getIntegrationPass() {
+  return integrationPassword;
+}

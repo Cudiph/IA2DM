@@ -7,10 +7,9 @@
   import settingsIcon from '../assets/cog-outline.svg';
   import dockIcon from '../assets/dock-window.svg';
   import browser from 'webextension-polyfill';
-  import { wsConn, cfg } from './store';
+  import { aria2WS, integrationWS, cfg } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
 
-  export let ws;
   let intercept = false;
   browser.storage.local.get('intercept').then((res) => {
     intercept = res.intercept;
@@ -18,17 +17,17 @@
 
   function resumeAll() {
     const aria2json = getAria2JSON(cfg);
-    wsConn.send(aria2json.unpauseAll());
+    $aria2WS.send(aria2json.unpauseAll());
   }
 
   function pauseAll() {
     const aria2json = getAria2JSON(cfg);
-    wsConn.send(aria2json.pauseAll());
+    $aria2WS.send(aria2json.pauseAll());
   }
 
   async function clearHistory() {
     const aria2json = getAria2JSON(cfg);
-    wsConn.send(aria2json.purgeDownloadResult());
+    $aria2WS.send(aria2json.purgeDownloadResult());
     browser.storage.local.set({ dlHistory: [] });
   }
 
@@ -73,11 +72,21 @@
     <div class="indicator-container">
       <div
         class="circle circle-small"
-        style="background-color: var(--color-{ws ? 'complete' : 'error'})"
+        style="background-color: var(--color-{$aria2WS ? 'complete' : 'error'})"
       ></div>
-      <span style="font-size: 14px;" title={ws && cfg.name}
-        >{ws ? 'Connected' : 'Disconnected'}</span
+      <span
+        style="font-size: 14px; margin: 0 1px"
+        title={$aria2WS
+          ? cfg.name + ($aria2WS && ' + Aria2Tray Integration')
+          : $integrationWS && 'Integration only'}
       >
+        {$aria2WS ? 'Connected' : 'Disconnected'}
+      </span>
+      <div
+        class="circle circle-small"
+        class:hide={!$integrationWS}
+        style="background-color: var(--color-complete)"
+      ></div>
     </div>
   </div>
   <div class="misc-action flex">

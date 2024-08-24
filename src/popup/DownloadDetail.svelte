@@ -1,7 +1,58 @@
 <script>
-  import { selectedItem } from './store';
+  import { selectedItem, getIntegrationPass, integrationWS } from './store';
   import { getDefaultIcon } from '../lib/graphics';
-  import { bestBytesString, bestTimeString, capitalize } from '../lib/util';
+  import {
+    bestBytesString,
+    bestTimeString,
+    capitalize,
+    wsRpcFetch,
+    getDirnameBasename,
+  } from '../lib/util';
+  import { Aria2Tray } from '../lib/aria2tray';
+  import { onDestroy } from 'svelte';
+
+  const a2t = new Aria2Tray(getIntegrationPass());
+
+  let fileState = {
+    exist: false,
+  };
+
+  let folderState = {
+    exist: false,
+  };
+
+  async function deleteFile() {
+    const fullPath = `${$selectedItem.dirname}/${$selectedItem.basename}`;
+    const res = await wsRpcFetch($integrationWS, a2t.delete('id_c', fullPath));
+    if (res.result === 'OK') fileState.exist = false;
+  }
+
+  function openFolder() {
+    $integrationWS.send(a2t.open('id_c', $selectedItem.dirname));
+  }
+
+  function openFile() {
+    const fullPath = `${$selectedItem.dirname}/${$selectedItem.basename}`;
+    $integrationWS.send(a2t.open('id_c', fullPath));
+  }
+
+  async function initInfo() {
+    if (!$integrationWS) return;
+
+    const folder = await wsRpcFetch($integrationWS, a2t.status('id_c', $selectedItem.dirname));
+    const fullPath = `${$selectedItem.dirname}/${$selectedItem.basename}`;
+    const file = await wsRpcFetch($integrationWS, a2t.status('id_c', fullPath));
+    fileState.exist = file.result?.exist;
+    folderState.exist = folder.result?.exist;
+  }
+
+  const iWSunsub = integrationWS.subscribe((val) => {
+    if (!val) return;
+    initInfo();
+  });
+
+  initInfo();
+  onDestroy(iWSunsub);
 </script>
 
 <div class="container">
@@ -16,6 +67,7 @@
     ><b>Connections:</b> {$selectedItem.connections}</span
   >
   <span class:hide={!$selectedItem.seeder}><b>Seeders:</b> {$selectedItem.numSeeders}</span>
+
   <table>
     <tr>
       <th>Key</th>
@@ -31,11 +83,29 @@
     </tr>
     <tr>
       <td>File location</td>
-      <td>{$selectedItem.dirname ? `${$selectedItem.dirname}/` : ''}{$selectedItem.basename}</td>
+      <td>
+        {$selectedItem.dirname ? `${$selectedItem.dirname}/` : ''}{$selectedItem.basename}
+        <div class:hide={!$integrationWS}>
+          <button class="file-action" class:hide={!fileState.exist} on:click={openFile}
+            >Open File</button
+          >
+          <button class="file-action" class:hide={!folderState.exist} on:click={openFolder}
+            >Open Folder</button
+          >
+          <button class="file-action" class:hide={!fileState.exist} on:click={deleteFile}
+            >Delete File</button
+          >
+        </div>
+      </td>
     </tr>
     <tr style="color: var(--color-{$selectedItem.seeder ? 'complete' : $selectedItem.status})">
       <td>Status</td>
-      <td>{$selectedItem.seeder ? 'Seeding' : capitalize($selectedItem.status)}</td>
+      <td>
+        {$selectedItem.seeder ? 'Seeding' : capitalize($selectedItem.status)}
+        <span class:hide={!$integrationWS || fileState.exist} style="color: var(--color-removed)"
+          >(deleted or moved)</span
+        >
+      </td>
     </tr>
     <tr class:hide={!$selectedItem.completedLength}>
       <td>Downloaded</td>
@@ -131,5 +201,9 @@
 
   th {
     background-color: var(--bg-color-hover);
+  }
+
+  .file-action {
+    padding: 7px 10px;
   }
 </style>

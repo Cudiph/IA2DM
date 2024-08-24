@@ -2,9 +2,8 @@
   import browser from 'webextension-polyfill';
   import { getAria2OOP } from '../lib/aria2rpc';
   import { cookiesStringify } from '../lib/util';
-  import { getWSConn, cfg } from './store';
+  import { aria2WS, cfg } from './store';
   let input = '';
-  let anyConnection = null;
   let error = false;
   let success = false;
   let files;
@@ -15,10 +14,6 @@
   browser.storage.local.get(['dirList', 'addPageLastDir']).then((res) => {
     dir = res.addPageLastDir || '';
     dirList = res.dirList || [];
-  });
-
-  getWSConn().then((res) => {
-    anyConnection = res;
   });
 
   /**
@@ -113,7 +108,7 @@
 </script>
 
 <div class="container">
-  {#if anyConnection}
+  {#if $aria2WS}
     <label>
       Paste URL here
       <textarea name="" id="" bind:value={input}></textarea>

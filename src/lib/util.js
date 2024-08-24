@@ -181,3 +181,49 @@ export async function findAndRemoveHistory(gid) {
 export function capitalize(txt) {
   return txt[0].toUpperCase() + txt.slice(1);
 }
+
+/** @param {number} len */
+export function randASCII(len) {
+  const list = [];
+  const range = 0x7f - 0x20;
+  while (list.length !== len) {
+    list.push(String.fromCharCode(Math.floor(Math.random() * range) + 0x20));
+  }
+
+  return list.join('');
+}
+
+/**
+ * request -> response kinda way for websocket
+ *
+ * @param {WebSocket} ws
+ * @param {any} req - ws.send(req)
+ * @param {number} timeout - in ms
+ */
+export async function wsRpcFetch(ws, req, timeout = 10000) {
+  if (typeof req === 'string') {
+    req = JSON.parse(req);
+  }
+
+  req.id = randASCII(16);
+
+  return new Promise((resolve, reject) => {
+    const id = setTimeout(() => {
+      reject('request timed out');
+    }, timeout);
+
+    /** @param {MessageEvent<any>} ev */
+    function process(ev) {
+      const data = JSON.parse(ev.data);
+      if (data.id !== req.id) return;
+      resolve(data);
+
+      clearTimeout(id);
+      ws.removeEventListener('message', process);
+    }
+
+    ws.addEventListener('message', process);
+
+    ws.send(JSON.stringify(req));
+  });
+}

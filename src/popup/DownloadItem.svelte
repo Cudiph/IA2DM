@@ -4,16 +4,35 @@
   import clearIcon from '../assets/delete-outline.svg';
   import xIcon from '../assets/close.svg';
   import stopIcon from '../assets/stop.svg';
-  import { wsConn, cfg, selectedItem, storageCache } from './store';
+  import folderIcon from '../assets/folder-outline.svg';
+  import {
+    cfg,
+    selectedItem,
+    storageCache,
+    getIntegrationPass,
+    aria2WS,
+    integrationWS,
+  } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDefaultIcon } from '../lib/graphics';
-  import { bestBytesString, bestTimeString, findAndRemoveHistory, capitalize } from '../lib/util';
+  import {
+    bestBytesString,
+    bestTimeString,
+    findAndRemoveHistory,
+    capitalize,
+    wsRpcFetch,
+  } from '../lib/util';
+  import { Aria2Tray } from '../lib/aria2tray';
+  import { slide } from 'svelte/transition';
 
   /** @type {DownloadItem} */
   export let item;
   let hasDetail = item.dlSpeed || item.completedLength || item.filesize || item.uploadSpeed;
   let lastClick = 0; // unix epoch
   const patientThreshold = 3000; // ms
+  let hovered = false;
+  let dirnameExist = false;
+  let fileExist = false;
 
   function impatientTest() {
     const diff = +new Date() - lastClick;
@@ -23,15 +42,15 @@
 
   async function handleResumeClick() {
     const aria2json = getAria2JSON(cfg);
-    wsConn.send(aria2json.unpause(item.gid));
+    $aria2WS.send(aria2json.unpause(item.gid));
   }
 
   async function handlePauseClick() {
     const aria2json = getAria2JSON(cfg);
     if (impatientTest()) {
-      wsConn.send(aria2json.pause(item.gid));
+      $aria2WS.send(aria2json.pause(item.gid));
     } else {
-      wsConn.send(aria2json.forcePause(item.gid));
+      $aria2WS.send(aria2json.forcePause(item.gid));
     }
     lastClick = +new Date();
   }
@@ -39,15 +58,20 @@
   async function handleRemoveClick() {
     const aria2json = getAria2JSON(cfg);
     if (impatientTest()) {
-      wsConn.send(aria2json.forceRemove(item.gid));
+      $aria2WS.send(aria2json.forceRemove(item.gid));
     } else {
-      wsConn.send(aria2json.remove(item.gid));
+      $aria2WS.send(aria2json.remove(item.gid));
     }
     lastClick = +new Date();
   }
 
   async function handleClearClick() {
     findAndRemoveHistory(item.gid);
+  }
+
+  async function handleFolderClick() {
+    const a2t = new Aria2Tray(getIntegrationPass());
+    await wsRpcFetch($integrationWS, a2t.open('id_c', item.dirname));
   }
 
   /**
@@ -65,95 +89,141 @@
     location.hash = '#item-detail';
   }
 
+  async function onHover() {
+    hovered = true;
+    if (!$integrationWS) return;
+    const a2t = new Aria2Tray(getIntegrationPass());
+    const [dirname, file] = await Promise.all([
+      wsRpcFetch($integrationWS, a2t.status(0, item.dirname)),
+      wsRpcFetch($integrationWS, a2t.status(0, item.dirname + '/' + item.basename)),
+    ]);
+
+    if (dirname.result?.exist) dirnameExist = true;
+    if (file.result?.exist) fileExist = true;
+  }
+
+  function onLeave() {
+    hovered = false;
+  }
+
   const TITLE_PAUSE = 'Pause this download';
   const TITLE_RESUME = 'Resume this download';
   const TITLE_STOP = 'Stop seeding';
-  const TITLE_CLEAR = 'Clear this download from history';
+  const TITLE_CLEAR = "Clear this download from history (file won't get deleted)";
   const TITLE_DELETE = 'Delete/cancel this download';
+  const TITLE_OPEN_FOLDER = 'Open folder';
 </script>
 
-<div class="container">
+<div
+  class="container"
+  role="listitem"
+  on:mouseover={onHover}
+  on:focus={onHover}
+  on:mouseleave={onLeave}
+  on:blur={onLeave}
+>
   <div class="icon">
     <img src={item.icon || getDefaultIcon()} alt="icon" />
   </div>
+
   <div class="summary">
     <div class="basename" title={item.basename}>
-      <button on:click={openDetailPage}
-        >{item.basename || item.url || `#${item.gid}` || "Can't fetch download name"}</button
+      <button on:click={openDetailPage} on:focus={onHover}
+        >{item.basename || item.url || `#${item.gid}` || 'Unnamed Download'}</button
       >
     </div>
+
     {#if item.status === 'active' || item.status === 'paused'}
       <div class="progress-bar">
         <div class="bar">
           <div
             class="inner-bar"
-            style="width: {Math.floor(
-              (item.completedLength / item.filesize) * 100
-            )}%; background-color: {$storageCache.progressColor || '#faf'}"
+            style="width: {Math.floor((item.completedLength / item.filesize) * 100)}%;
+            background-color: {$storageCache.progressColor || '#faf'}"
           ></div>
         </div>
       </div>
     {/if}
+
     <div class="etc">
-      {#if item.seeder}
-        <span style="color: var(--color-complete); font-weight: 500;">Seeding</span>
-        <span class:hide={!hasDetail}>-</span>
-        <span class:hide={!item.uploadLength}
-          >{bestBytesString(item.uploadLength)} ({parseFloat(
-            (item.uploadLength / item.completedLength).toFixed(2)
-          )}:1)</span
-        >
-        {#if item.uploadSpeed && item.seeder}
-          <span>({bestBytesString(item.uploadSpeed)}/sec)</span>
+      {#if !hovered || !$integrationWS}
+        {#if item.seeder}
+          <span style="color: var(--color-complete); font-weight: 500;">Seeding</span>
+          <span class:hide={!hasDetail}>-</span>
+          <span class:hide={!item.uploadLength}>
+            {bestBytesString(item.uploadLength)} ({parseFloat(
+              (item.uploadLength / item.completedLength).toFixed(2)
+            )}:1)
+          </span>
+          {#if item.uploadSpeed && item.seeder}
+            <span>({bestBytesString(item.uploadSpeed)}/sec)</span>
+          {/if}
+        {:else}
+          <span
+            class:hide={item.status === 'active'}
+            style="color: var(--color-{item.status}); font-weight: 500;"
+          >
+            {capitalize(item.status)}
+          </span>
+          <span class:hide={item.status !== 'active'}>
+            {bestTimeString(calculateETA(item.dlSpeed, item.completedLength, item.filesize))} left
+          </span>
+          <span class:hide={!hasDetail}>-</span>
+          {#if item.completedLength && item.status !== 'complete'}
+            <span>{bestBytesString(item.completedLength, { comparison: item.filesize })} /</span>
+          {/if}
+          {#if item.filesize > 0}
+            <span class:hide={item.filesize <= 0}>{bestBytesString(item.filesize)}</span>
+          {/if}
+          {#if item.dlSpeed && item.status === 'active'}
+            <span>({bestBytesString(item.dlSpeed)}/sec)</span>
+          {/if}
         {/if}
       {:else}
-        <span
-          class:hide={item.status === 'active'}
-          style="color: var(--color-{item.status}); font-weight: 500;"
-          >{capitalize(item.status)}</span
-        >
-        <span class:hide={item.status !== 'active'}
-          >{bestTimeString(calculateETA(item.dlSpeed, item.completedLength, item.filesize))} left</span
-        >
-        <span class:hide={!hasDetail}>-</span>
-        {#if item.completedLength && item.status !== 'complete'}
-          <span>{bestBytesString(item.completedLength, { comparison: item.filesize })} /</span>
-        {/if}
-        {#if item.filesize > 0}
-          <span class:hide={item.filesize <= 0}>{bestBytesString(item.filesize)}</span>
-        {/if}
-        {#if item.dlSpeed && item.status === 'active'}
-          <span>({bestBytesString(item.dlSpeed)}/sec)</span>
-        {/if}
+        <span>{fileExist ? item.dirname : 'File missing'}</span>
       {/if}
       {#if item.basename.indexOf('.') !== -1}
         <span class="capsule">{item.basename.split('.').pop()}</span>
       {/if}
     </div>
   </div>
-  <div class="control">
-    {#if item.status === 'paused'}
-      <button on:click={handleResumeClick} title={TITLE_RESUME}>
-        <img class="img-icon" src={resumeIcon} alt="Resume" />
+
+  {#if hovered}
+    <div class="control" transition:slide={{ axis: 'x', duration: 100 }}>
+      {#if item.status === 'paused'}
+        <button on:click={handleResumeClick} title={TITLE_RESUME}>
+          <img class="img-icon" src={resumeIcon} alt="Resume" />
+        </button>
+      {:else if item.status === 'active'}
+        <button on:click={handlePauseClick} title={TITLE_PAUSE}>
+          <img class="img-icon" src={pauseIcon} alt="Pause" />
+        </button>
+      {/if}
+      <button
+        class:hide={!$integrationWS || !fileExist}
+        on:click={handleFolderClick}
+        title={TITLE_OPEN_FOLDER}
+      >
+        <img class="img-icon" src={folderIcon} alt="Open folder" />
       </button>
-    {:else if item.status === 'active'}
-      <button on:click={handlePauseClick} title={TITLE_PAUSE}>
-        <img class="img-icon" src={pauseIcon} alt="Pause" />
-      </button>
-    {/if}
-    {#if item.status === 'paused' || item.status === 'active'}
-      <button on:click={handleRemoveClick} title={item.seeder ? TITLE_STOP : TITLE_DELETE}>
-        <img class="img-icon" src={item.seeder ? stopIcon : xIcon} alt="Delete" />
-      </button>
-    {:else}
-      <button on:click={handleClearClick} title={TITLE_CLEAR}>
-        <img class="img-icon" src={clearIcon} alt="Clear" />
-      </button>
-    {/if}
-  </div>
+      {#if item.status === 'paused' || item.status === 'active'}
+        <button on:click={handleRemoveClick} title={item.seeder ? TITLE_STOP : TITLE_DELETE}>
+          <img class="img-icon" src={item.seeder ? stopIcon : xIcon} alt="Delete" />
+        </button>
+      {:else}
+        <button on:click={handleClearClick} title={TITLE_CLEAR}>
+          <img class="img-icon" src={clearIcon} alt="Clear" />
+        </button>
+      {/if}
+    </div>
+  {/if}
 </div>
 
 <style>
+  .hide {
+    display: none;
+  }
+
   button {
     display: flex;
     justify-content: center;
@@ -212,8 +282,10 @@
     display: block;
     box-sizing: border-box;
     max-width: 100%;
+    min-width: 100%;
     padding: 0;
     margin: 0;
+    text-align: left;
   }
 
   .basename button:hover,

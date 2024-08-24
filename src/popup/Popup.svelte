@@ -3,13 +3,15 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { getWSConn, page, cfg, selectedItem } from './store';
+  import { integrationWS, page, cfg, aria2WS, selectedItem, setIntegrationPass } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
+  import { Aria2Tray } from '../lib/aria2tray';
   import { getDirnameBasename, getFolderName } from '../lib/util';
   import DownloadDetail from './DownloadDetail.svelte';
+  import { slide, scale } from 'svelte/transition';
+  import { onDestroy } from 'svelte';
 
   let intervalID = null;
-  let ws = null;
 
   let activeDownloadList = [];
   let dlHistory = [];
@@ -44,7 +46,9 @@
     dlHistory = changes.dlHistory.newValue;
   });
 
-  function initIntervalPolling() {
+  function initIntervalPolling(ws) {
+    if (intervalID) finiIntervalPolling();
+
     const aria2json = getAria2JSON(cfg, { id: 'popupIntervalPolling' });
     const handler = () => {
       ws.send(`[${aria2json.tellActive()}, ${aria2json.tellWaiting(0, 9999)}]`);
@@ -56,7 +60,6 @@
   function finiIntervalPolling() {
     clearInterval(intervalID);
     intervalID = null;
-    ws = null;
   }
 
   /**
@@ -122,25 +125,18 @@
     activeDownloadList = [...newActiveDownloads];
   }
 
-  function tryReconnect() {
-    setTimeout(() => {
-      initWebSocket();
-    }, 3000);
+  function clearError() {
+    browser.storage.local.set({ lastError: '' });
+    lastError = '';
   }
 
   // begin
-  async function initWebSocket() {
-    ws = await getWSConn();
-    if (!ws) {
-      tryReconnect();
-      return;
-    }
+  const ariaWSunsub = aria2WS.subscribe((conn) => {
+    if (!conn) return;
 
-    ws.addEventListener('open', (_) => {
-      initIntervalPolling();
-    });
+    initIntervalPolling(conn);
 
-    ws.addEventListener('message', (ev) => {
+    conn.addEventListener('message', (ev) => {
       const data = JSON.parse(ev.data);
 
       if (data.length) {
@@ -148,18 +144,23 @@
       }
     });
 
-    ws.addEventListener('close', (_) => {
+    conn.addEventListener('close', (_) => {
       finiIntervalPolling();
-      tryReconnect();
     });
-  }
+  });
 
-  function clearError() {
-    browser.storage.local.set({ lastError: '' });
-    lastError = '';
-  }
+  const iWSunsub = integrationWS.subscribe(async (conn) => {
+    if (!conn) return;
 
-  initWebSocket();
+    conn.addEventListener('message', async (ev) => {
+      const data = JSON.parse(ev.data);
+
+      if (data.error) console.error(data.error);
+    });
+  });
+
+  onDestroy(ariaWSunsub);
+  onDestroy(iWSunsub);
 </script>
 
 <div class="root-container">
@@ -176,18 +177,18 @@
   {:else if $page === '#item-detail'}
     <DownloadDetail />
   {:else}
-    <Header {ws} />
+    <Header />
     <main>
       {#if !has_required_optional_perms}
         <h2>Additional Permission Required.</h2>
       {:else}
-        {#each activeDownloadList as item}
-          <div class="item">
+        {#each activeDownloadList as item (item.gid)}
+          <div class="item" in:slide out:scale>
             <DownloadItem {item} />
           </div>
         {/each}
-        {#each dlHistory as item}
-          <div class="item">
+        {#each dlHistory as item (item.gid)}
+          <div class="item" in:slide out:scale>
             <DownloadItem {item} />
           </div>
         {/each}
