@@ -135,7 +135,7 @@
   const TITLE_OUTLINE_COLOR = 'Set outline color in CSS color format';
   const TITLE_RESET =
     'Reset all data stored in the storage in case the UI accessing undefined property';
-  const TITLE_ARIA2DECIDEFILENAME = `Use browser given filename if disabled. Enable if aria2 won't continue download because of different name`;
+  const TITLE_ARIA2DECIDEFILENAME = `Enable if aria2 didn't continue download because of different name. Disable to use browser given name`;
 </script>
 
 <main>

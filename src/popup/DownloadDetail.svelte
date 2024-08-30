@@ -32,6 +32,9 @@
   }
 
   function openFile() {
+    if ($selectedItem.basename.endsWith('.exe')) {
+      if (!confirm('You are about to open an EXECUTABLE FILE, proceed?')) return;
+    }
     const fullPath = `${$selectedItem.dirname}/${$selectedItem.basename}`;
     $integrationWS.send(a2t.open('id_c', fullPath));
   }

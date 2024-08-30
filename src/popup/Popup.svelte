@@ -3,9 +3,8 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { integrationWS, page, cfg, aria2WS, selectedItem, setIntegrationPass } from './store';
+  import { integrationWS, page, cfg, aria2WS, selectedItem } from './store';
   import { getAria2JSON } from '../lib/aria2rpc';
-  import { Aria2Tray } from '../lib/aria2tray';
   import { getDirnameBasename, getFolderName } from '../lib/util';
   import DownloadDetail from './DownloadDetail.svelte';
   import { slide, scale } from 'svelte/transition';
