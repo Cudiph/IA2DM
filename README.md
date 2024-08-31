@@ -13,9 +13,12 @@
   <summary>Click to expand!</summary>
   <br>
 
-![Popup 1](./misc/popup.png) ![Popup 2](./misc/popup2.png)
-![Error](./misc/download_error.png) ![Complete](./misc/download_complete.png)
+![Popup 1](./misc/popup.png)
+![Popup 2](./misc/popup2.png)
+![Error](./misc/download_error.png)
+![Complete](./misc/download_complete.png)
 ![options](./misc/options.png)
+![Integration](./misc/integration.png)
 
 </details>
 
@@ -34,6 +37,9 @@
 - Fallback server - Add another server configuration as a fallback if the main
   one fail. Program will try to connect from top to bottom order in the options.
 - Cross Browser - Works on both firefox or chromium based browsers.
+
+Integration with [Aria2 Tray](https://github.com/Cudiph/aria2tray) is available which
+you can open and delete file/folder right in the download history see [screenshot](./misc/integration.png).
 
 ## Guides
 
