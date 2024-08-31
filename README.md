@@ -79,9 +79,6 @@
 
 ## Known issues
 
-- In chromium based browser on windows, downloaded files will be saved in path
-  relative to working directory of aria2. Set `Save files to` in the quick
-  options to fix this issue.
 - If you got `socket error` when using aria2 cli in Windows try adding
   `--disable-ipv6` flag.
 - For SSL certificate error when downloading, try adding
