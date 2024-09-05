@@ -227,3 +227,27 @@ export async function wsRpcFetch(ws, req, timeout = 10000) {
     ws.send(JSON.stringify(req));
   });
 }
+
+/**
+ * 0, if the s1 and s2 are equal;
+ * a negative value if s1 is less than s2;
+ * a positive value if s1 is greater than s2.
+ *
+ * @param {string} s1
+ * @param {string} s2
+ */
+export function semverCmp(s1, s2) {
+  const semver_l = s1.split('.');
+  const semver_r = s2.split('.');
+
+  for (let i = 0; i < 3; i++) {
+    const left = parseInt(semver_l[i]);
+    const right = parseInt(semver_r[i]);
+
+    if (left !== right) {
+      return right - left;
+    }
+  }
+
+  return 0;
+}

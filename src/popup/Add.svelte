@@ -1,8 +1,9 @@
 <script>
   import browser from 'webextension-polyfill';
   import { getAria2OOP } from '../lib/aria2rpc';
-  import { cookiesStringify } from '../lib/util';
-  import { aria2WS, cfg } from './store';
+  import { cookiesStringify, wsRpcFetch, semverCmp } from '../lib/util';
+  import { aria2WS, integrationWS, integrationVersion, getIntegrationPass, cfg } from './store';
+  import { Aria2Tray } from '../lib/aria2tray';
   let input = '';
   let error = false;
   let success = false;
@@ -98,6 +99,14 @@
     return name.split('.').pop();
   }
 
+  async function chooseFile() {
+    const a2t = new Aria2Tray(getIntegrationPass());
+    const res = await wsRpcFetch($integrationWS, a2t.filePicker('id_c', 'folder'), 1e10);
+
+    if (!res.result?.selected) return;
+    dir = res.result.selected;
+  }
+
   $: if (files?.length > 1) {
     ext = 'Files';
   } else if (files?.length) {
@@ -131,6 +140,9 @@
           <option value={d}>{d}</option>
         {/each}
       </select>
+      {#if integrationWS && semverCmp('0.2.0', $integrationVersion) >= 0}
+        <button class="action" on:click={chooseFile}>Browse...</button>
+      {/if}
     </label>
     <div class="msg">
       {#if success}
@@ -139,8 +151,10 @@
         <p>Download failed, reason: {error}</p>
       {/if}
     </div>
-    <button on:click={addNewDownloadHandler}>Add {ext}</button>
-    <button on:click={(_) => (location.hash = '#main')}>cancel</button>
+    <div class="bottom-buttons">
+      <button on:click={addNewDownloadHandler}>Add {ext}</button>
+      <button on:click={(_) => (location.hash = '#main')}>Cancel</button>
+    </div>
   {:else}
     <div class="center">
       <h1>Not connected to any aria2 instance</h1>
@@ -171,5 +185,14 @@
 
   .center button {
     margin-bottom: 20px;
+  }
+
+  .action {
+    padding: 5px;
+    margin: 0;
+  }
+
+  .bottom-buttons {
+    margin-top: 10px;
   }
 </style>

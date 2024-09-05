@@ -61,6 +61,20 @@ export class Aria2Tray {
 
   /**
    * @param {number | string} id
+   * @param {"file" | "folder"} type
+   * @param {string?} filter
+   */
+  filePicker(id, type, filter) {
+    return JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'filePicker',
+      id,
+      params: [`token:${this.secret}`, type, filter],
+    });
+  }
+
+  /**
+   * @param {number | string} id
    */
   version(id) {
     return JSON.stringify({

@@ -77,6 +77,8 @@ export let aria2WS = readable(null, function start(set, update) {
   init();
 });
 
+export let integrationVersion = writable('0.1.0');
+
 /** @type {import('svelte/store').Readable<WebSocket>} */
 export let integrationWS = readable(null, function start(set) {
   function retry() {
@@ -97,6 +99,7 @@ export let integrationWS = readable(null, function start(set) {
         if (res.result) {
           set(ws);
           setIntegrationPass(secret);
+          integrationVersion.update((_) => res.result.version);
           break;
         }
       }
