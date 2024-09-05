@@ -2,7 +2,8 @@
   import browser from 'webextension-polyfill';
   import { getAria2OOP } from '../lib/aria2rpc';
   import { cookiesStringify, wsRpcFetch, semverCmp } from '../lib/util';
-  import { aria2WS, integrationWS, integrationVersion, getIntegrationPass, cfg } from './store';
+  import { aria2WS, cfg } from './store';
+  import { integrationWS, integrationVersion, getIntegrationPass } from '../lib/store';
   import { Aria2Tray } from '../lib/aria2tray';
   let input = '';
   let error = false;
@@ -99,7 +100,7 @@
     return name.split('.').pop();
   }
 
-  async function chooseFile() {
+  async function chooseFolder() {
     const a2t = new Aria2Tray(getIntegrationPass());
     const res = await wsRpcFetch($integrationWS, a2t.filePicker('id_c', 'folder'), 1e10);
 
@@ -141,7 +142,7 @@
         {/each}
       </select>
       {#if integrationWS && semverCmp('0.2.0', $integrationVersion) >= 0}
-        <button class="action" on:click={chooseFile}>Browse...</button>
+        <button class="action" on:click={chooseFolder}>Browse...</button>
       {/if}
     </label>
     <div class="msg">

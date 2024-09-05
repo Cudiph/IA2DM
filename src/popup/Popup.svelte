@@ -3,7 +3,8 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { integrationWS, page, cfg, aria2WS, selectedItem } from './store';
+  import { page, cfg, aria2WS, selectedItem } from './store';
+  import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDirnameBasename, getFolderName } from '../lib/util';
   import DownloadDetail from './DownloadDetail.svelte';

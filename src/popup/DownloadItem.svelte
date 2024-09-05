@@ -5,14 +5,8 @@
   import xIcon from '../assets/close.svg';
   import stopIcon from '../assets/stop.svg';
   import folderIcon from '../assets/folder-outline.svg';
-  import {
-    cfg,
-    selectedItem,
-    storageCache,
-    getIntegrationPass,
-    aria2WS,
-    integrationWS,
-  } from './store';
+  import { cfg, selectedItem, storageCache, aria2WS } from './store';
+  import { getIntegrationPass, integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDefaultIcon } from '../lib/graphics';
   import {

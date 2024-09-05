@@ -91,6 +91,14 @@ button:focus-visible {
   border: solid 1px yellow;
 }
 
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
 @media (prefers-color-scheme: dark) {
   .img-icon {
     filter: invert(100%);

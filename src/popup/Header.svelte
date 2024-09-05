@@ -7,7 +7,8 @@
   import settingsIcon from '../assets/cog-outline.svg';
   import dockIcon from '../assets/dock-window.svg';
   import browser from 'webextension-polyfill';
-  import { aria2WS, integrationWS, cfg } from './store';
+  import { aria2WS, cfg } from './store';
+  import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
 
   let intercept = false;

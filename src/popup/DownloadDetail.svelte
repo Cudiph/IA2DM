@@ -1,5 +1,6 @@
 <script>
-  import { selectedItem, getIntegrationPass, integrationWS } from './store';
+  import { selectedItem } from './store';
+  import { getIntegrationPass, integrationWS } from '../lib/store';
   import { getDefaultIcon } from '../lib/graphics';
   import {
     bestBytesString,

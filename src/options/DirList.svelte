@@ -1,6 +1,9 @@
 <script>
   import browser from 'webextension-polyfill';
   import { slide } from 'svelte/transition';
+  import { getIntegrationPass, integrationVersion, integrationWS } from '../lib/store';
+  import { semverCmp, wsRpcFetch } from '../lib/util';
+  import { Aria2Tray } from '../lib/aria2tray';
 
   let dirList = [];
   let inp = '';
@@ -25,6 +28,13 @@
   /** @param {string[]} dirList */
   function save(dirList) {
     browser.storage.local.set({ dirList: dirList });
+  }
+
+  async function chooseFolder() {
+    const a2t = new Aria2Tray(getIntegrationPass());
+    const res = await wsRpcFetch($integrationWS, a2t.filePicker('id_c', 'folder'), 1e10);
+    if (!res.result?.selected) return;
+    addText(res.result.selected);
   }
 
   browser.storage.local.get('dirList').then((res) => {
@@ -69,6 +79,9 @@
   >
     <input type="text" bind:value={inp} />
     <button type="submit">Add path</button>
+    {#if $integrationWS && semverCmp('0.2.0', $integrationVersion) >= 0}
+      <button on:click={chooseFolder}>Browse...</button>
+    {/if}
   </form>
 </div>
 

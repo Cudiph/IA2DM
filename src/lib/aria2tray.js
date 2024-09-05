@@ -64,7 +64,7 @@ export class Aria2Tray {
    * @param {"file" | "folder"} type
    * @param {string?} filter
    */
-  filePicker(id, type, filter) {
+  filePicker(id, type, filter = '') {
     return JSON.stringify({
       jsonrpc: '2.0',
       method: 'filePicker',

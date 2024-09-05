@@ -4,6 +4,9 @@
   import { getAria2OOP } from '../lib/aria2rpc';
   import { RPCs } from './store';
   import './shared.css';
+  import { getIntegrationPass, integrationVersion, integrationWS } from '../lib/store';
+  import { Aria2Tray } from '../lib/aria2tray';
+  import { semverCmp, wsRpcFetch } from '../lib/util';
 
   /** @type {RPCConfig} */
   export let rpcConfig;
@@ -139,6 +142,14 @@
     }
   }
 
+  async function chooseFolder() {
+    const a2t = new Aria2Tray(getIntegrationPass());
+    const res = await wsRpcFetch($integrationWS, a2t.filePicker('id_c', 'folder'), 1e10);
+
+    if (!res.result?.selected) return;
+    quickTableForTextInput.dir = res.result.selected;
+  }
+
   const TITLE_HOSTNAME = 'Value can hostname/IP Address/Domain name';
   const TITLE_PORT = 'Port where aria2 is listening in range 1024-65535';
   const TITLE_SECRET = 'RPC authorization secret token (keep empty if not set)';
@@ -178,8 +189,11 @@
 
   <span class="subheader">Quick Options</span>
   <hr />
-  <label title={TITLE_SAVES_FILES_TO}>
+  <label class="relative" title={TITLE_SAVES_FILES_TO}>
     <span>Save files to</span>
+    {#if $integrationWS && semverCmp('0.2.0', $integrationVersion) >= 0}
+      <button class="inline-button" on:click={chooseFolder}>Browse...</button>
+    {/if}
     <input
       type="text"
       bind:value={quickTableForTextInput.dir}
@@ -291,5 +305,16 @@
 
   caption {
     caption-side: bottom;
+  }
+
+  label {
+    align-items: center;
+  }
+
+  .inline-button {
+    margin: 0;
+    padding: 6px;
+    position: absolute;
+    left: 102%;
   }
 </style>
