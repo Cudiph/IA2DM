@@ -38,7 +38,11 @@ export let cfg = null;
 
 /** @type {import('svelte/store').Readable<WebSocket>} */
 export let aria2WS = readable(null, function start(set, update) {
+  let ws = null;
+  let enoughTrying = false;
+
   function retry() {
+    if (enoughTrying) return;
     setTimeout(() => {
       init();
     }, 3000);
@@ -62,7 +66,7 @@ export let aria2WS = readable(null, function start(set, update) {
     cfg = RPCs[onlineIdx];
     storageCache.set({ progressColor, progressOutlineColor });
     const uri = `ws${cfg.secure ? 's' : ''}://${cfg.host}:${cfg.port}/jsonrpc`;
-    const ws = new WebSocket(uri);
+    ws = new WebSocket(uri);
     ws.addEventListener('open', async () => {
       set(ws);
     });
@@ -74,4 +78,12 @@ export let aria2WS = readable(null, function start(set, update) {
   }
 
   init();
+
+  return function stop() {
+    enoughTrying = true;
+    if (ws) {
+      ws.close();
+      ws = null;
+    }
+  };
 });

@@ -7,14 +7,18 @@ export let integrationVersion = writable('0.1.0');
 
 /** @type {import('svelte/store').Readable<WebSocket>} */
 export let integrationWS = readable(null, function start(set) {
+  let ws = null;
+  let enoughTrying = false;
+
   function retry() {
+    if (enoughTrying) return;
     setTimeout(() => {
       init();
     }, 3000);
   }
 
   function init() {
-    const ws = new WebSocket('ws://127.0.0.1:31795');
+    ws = new WebSocket('ws://127.0.0.1:31795');
 
     ws.addEventListener('open', async () => {
       const { RPCs } = await browser.storage.local.get(['RPCs']);
@@ -38,6 +42,14 @@ export let integrationWS = readable(null, function start(set) {
   }
 
   init();
+
+  return function stop() {
+    enoughTrying = true;
+    if (ws) {
+      ws.close();
+      ws = null;
+    }
+  };
 });
 
 let integrationPassword = '';
