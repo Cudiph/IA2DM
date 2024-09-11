@@ -50,7 +50,6 @@
     {#each dirList as teks, i}
       <div class="item" class:bg-even={i % 2 == 0} in:slide>
         <span class="text">{teks}</span>
-        <!-- svelte-ignore: a11y-visible -->
         <div
           class="icon"
           on:click={(_) => removeIndex(i)}

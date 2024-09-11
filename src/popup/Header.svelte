@@ -87,7 +87,7 @@
   <div class="flex">
     <div class="indicator-container">
       {#if $route.path === '/search'}
-        <!-- svelte-ignore: a11y-autofocus -->
+        <!-- svelte-ignore a11y-autofocus -->
         <input type="text" bind:value={$searchQuery} autofocus placeholder={SEARCH_TITLE} />
       {:else}
         <div
