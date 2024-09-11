@@ -3,11 +3,13 @@
   import addIcon from '../assets/plus.svg';
   import resumeIcon from '../assets/play.svg';
   import pauseIcon from '../assets/pause.svg';
+  import xIcon from '../assets/close.svg';
+  import searchIcon from '../assets/magnify.svg';
   import trashIcon from '../assets/delete-sweep-outline.svg';
   import settingsIcon from '../assets/cog-outline.svg';
   import dockIcon from '../assets/dock-window.svg';
   import browser from 'webextension-polyfill';
-  import { aria2WS, cfg } from './store';
+  import { aria2WS, cfg, page, searchQuery } from './store';
   import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
 
@@ -32,6 +34,15 @@
     browser.storage.local.set({ dlHistory: [] });
   }
 
+  function handleSearchClick() {
+    $searchQuery = '';
+    if ($page !== '#search') {
+      location.hash = '#search';
+    } else {
+      location.hash = '#main';
+    }
+  }
+
   function handleDetachClick() {
     browser.windows.create({
       url: window.location.href,
@@ -46,9 +57,12 @@
   }
 
   const ADD_TITLE = 'Add new download';
-  const CLEAR_ALL_TITLE = 'Clear download history and purge download result from aria2 memory';
+  const CLEAR_ALL_TITLE = "Clear download history (files won't get deleted)";
   const PAUSE_ALL_TITLE = 'Pause all active downloads';
   const RESUME_ALL_TITLE = 'Resume all paused downloads';
+  const SEARCH_TITLE = 'Search downloads';
+  const SEARCH_CLOSE_TITLE = 'Stop searching';
+  const DETACH_TITLE = 'Detach popup';
   const SETTINGS_TITLE = 'Open extension settings';
   const TOGGLE_TITLE = 'Toggle intercept downloads';
 </script>
@@ -71,33 +85,44 @@
   </div>
   <div class="flex">
     <div class="indicator-container">
-      <div
-        class="circle circle-small"
-        style="background-color: var(--color-{$aria2WS ? 'complete' : 'error'})"
-      ></div>
-      <span
-        style="font-size: 14px; margin: 0 1px"
-        title={$aria2WS
-          ? cfg.name + ($aria2WS && ' + Aria2Tray Integration')
-          : $integrationWS && 'Integration only'}
-      >
-        {$aria2WS ? 'Connected' : 'Disconnected'}
-      </span>
-      <div
-        class="circle circle-small"
-        class:hide={!$integrationWS}
-        style="background-color: var(--color-complete)"
-      ></div>
+      {#if $page === '#search'}
+        <!-- svelte-ignore: a11y-autofocus -->
+        <input type="text" bind:value={$searchQuery} autofocus placeholder={SEARCH_TITLE} />
+      {:else}
+        <div
+          class="circle circle-small"
+          style="background-color: var(--color-{$aria2WS ? 'complete' : 'error'})"
+        ></div>
+        <span
+          style="font-size: 14px; margin: 0 1px"
+          title={$aria2WS
+            ? cfg.name + ($aria2WS && ' + aria2Tray Integration')
+            : $integrationWS && 'Integration only'}
+        >
+          {$aria2WS ? 'Connected' : 'Disconnected'}
+        </span>
+        <div
+          class="circle circle-small"
+          class:hide={!$integrationWS}
+          style="background-color: var(--color-complete)"
+        ></div>
+      {/if}
     </div>
   </div>
   <div class="misc-action flex">
-    <button on:click={handleDetachClick}>
+    <button
+      on:click={handleSearchClick}
+      title={$page === '#search' ? SEARCH_CLOSE_TITLE : SEARCH_TITLE}
+    >
+      <img class="img-icon" src={$page === '#search' ? xIcon : searchIcon} alt="Search" />
+    </button>
+    <button on:click={handleDetachClick} title={DETACH_TITLE}>
       <img class="img-icon" src={dockIcon} alt="Detach" />
     </button>
     <button on:click={() => browser.runtime.openOptionsPage()} title={SETTINGS_TITLE}>
       <img class="img-icon" src={settingsIcon} alt="Settings" />
     </button>
-    <Toggle bind:booleanInput={intercept} title={TOGGLE_TITLE} button />
+    <Toggle bind:booleanInput={intercept} title={TOGGLE_TITLE} button={true} />
   </div>
 </header>
 

@@ -3,16 +3,17 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { page, cfg, aria2WS, selectedItem } from './store';
+  import { page, cfg, aria2WS, selectedItem, searchQuery } from './store';
   import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
-  import { getDirnameBasename, getFolderName } from '../lib/util';
+  import { getDirnameBasename, getFolderName, fuzzyFind } from '../lib/util';
   import DownloadDetail from './DownloadDetail.svelte';
   import { slide, scale } from 'svelte/transition';
   import { onDestroy } from 'svelte';
 
   let intervalID = null;
 
+  let filteredDownloadList = [];
   let activeDownloadList = [];
   let dlHistory = [];
   let lastError = '';
@@ -159,8 +160,22 @@
     });
   });
 
+  const searchQueryUnsub = searchQuery.subscribe((query) => {
+    filteredDownloadList = [];
+
+    for (const item of dlHistory) {
+      const filtered = fuzzyFind(item.basename, query);
+
+      if (filtered.length) {
+        item.highlight = filtered;
+        filteredDownloadList.push(item);
+      }
+    }
+  });
+
   onDestroy(ariaWSunsub);
   onDestroy(iWSunsub);
+  onDestroy(searchQueryUnsub);
 </script>
 
 <div class="root-container">
@@ -176,6 +191,24 @@
     <Add />
   {:else if $page === '#item-detail'}
     <DownloadDetail />
+  {:else if $page === '#search' && $searchQuery.trim()}
+    <Header />
+    <main>
+      {#if !has_required_optional_perms}
+        <h2>Additional Permission Required.</h2>
+      {:else}
+        {#each filteredDownloadList as item (item.gid)}
+          <div class="item" in:slide out:scale>
+            <DownloadItem {item} highlightIndexes={item.highlight} />
+          </div>
+        {/each}
+        {#if !filteredDownloadList.length}
+          <div class="notif">
+            <p>Nothing found.</p>
+          </div>
+        {/if}
+      {/if}
+    </main>
   {:else}
     <Header />
     <main>

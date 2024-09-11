@@ -1,5 +1,5 @@
 /**
- * Aria2Tray IPC utility class
+ * aria2Tray IPC utility class
  */
 
 export class Aria2Tray {

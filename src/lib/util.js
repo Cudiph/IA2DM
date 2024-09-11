@@ -229,6 +229,8 @@ export async function wsRpcFetch(ws, req, timeout = 10000) {
 }
 
 /**
+ * Format must be exactly `Major.minor.patch` without letter prefix/suffix.
+ *
  * 0, if the s1 and s2 are equal;
  * a negative value if s1 is less than s2;
  * a positive value if s1 is greater than s2.
@@ -250,4 +252,53 @@ export function semverCmp(s1, s2) {
   }
 
   return 0;
+}
+
+/**
+ * Perform insertion fuzzy finding and return the list of matching character index.
+ * empty list if pattern don't match.
+ * pattern such as `*` or `?` is not implemented.
+ *
+ * @param {string} s
+ * @param {string} pattern
+ */
+export function fuzzyFind(s, pattern, caseSensitive = false) {
+  const matchIndexes = [];
+  if (!pattern) return matchIndexes;
+
+  let pattern_index = 0;
+
+  if (!caseSensitive) {
+    s = s.toLowerCase();
+    pattern = pattern.toLowerCase();
+  }
+
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    const c_pattern = pattern[pattern_index];
+
+    if (c === c_pattern) {
+      matchIndexes.push(i);
+      pattern_index++;
+    }
+
+    if (pattern_index >= pattern.length) break;
+  }
+
+  if (pattern_index !== pattern.length) return [];
+
+  return matchIndexes;
+}
+
+const htmlEscapeLookup = {
+  '&': '&amp',
+  '<': '&lt',
+  '>': '&gt',
+  '"': '&quot',
+  "'": '&#39',
+};
+
+/** @param {string} s */
+export function escapeHTML(s) {
+  return s.replace(/[&"'<>]/g, (c) => htmlEscapeLookup[c]);
 }

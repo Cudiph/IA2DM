@@ -15,12 +15,15 @@
     findAndRemoveHistory,
     capitalize,
     wsRpcFetch,
+    escapeHTML,
   } from '../lib/util';
   import { Aria2Tray } from '../lib/aria2tray';
   import { slide } from 'svelte/transition';
 
   /** @type {DownloadItem} */
   export let item;
+  export let highlightIndexes = [];
+  let highlightedBasename = '';
   let hasDetail = item.dlSpeed || item.completedLength || item.filesize || item.uploadSpeed;
   let lastClick = 0; // unix epoch
   const patientThreshold = 3000; // ms
@@ -100,11 +103,30 @@
     hovered = false;
   }
 
+  /** @param {number[]} indexes */
+  function highlight(indexes) {
+    if (!indexes.length) return false;
+
+    let basenameInList = item.basename.split('');
+
+    for (let i = 0; i < basenameInList.length; i++) {
+      basenameInList[i] = escapeHTML(basenameInList[i]);
+    }
+
+    for (const idx of highlightIndexes) {
+      basenameInList[idx] =
+        `<span style="color: var(--color-error);">${basenameInList[idx]}</span>`;
+    }
+
+    highlightedBasename = basenameInList.join('');
+    return highlightedBasename;
+  }
+
   const TITLE_PAUSE = 'Pause this download';
   const TITLE_RESUME = 'Resume this download';
   const TITLE_STOP = 'Stop seeding';
-  const TITLE_CLEAR = "Clear this download from history (file won't get deleted)";
-  const TITLE_DELETE = 'Delete/cancel this download';
+  const TITLE_CLEAR = "Clear this download from history (files won't get deleted)";
+  const TITLE_DELETE = 'Delete/cancel this download (double click to force)';
   const TITLE_OPEN_FOLDER = 'Open folder';
 </script>
 
@@ -122,9 +144,13 @@
 
   <div class="summary">
     <div class="basename" title={item.basename}>
-      <button on:click={openDetailPage} on:focus={onHover}
-        >{item.basename || item.url || `#${item.gid}` || 'Unnamed Download'}</button
-      >
+      <button on:click={openDetailPage} on:focus={onHover}>
+        {#if highlightIndexes.length}
+          {@html highlight(highlightIndexes)}
+        {:else}
+          {item.basename || item.url || `#${item.gid}` || 'Unnamed Download'}
+        {/if}
+      </button>
     </div>
 
     {#if item.status === 'active' || item.status === 'paused'}
@@ -133,7 +159,7 @@
           <div
             class="inner-bar"
             style="width: {Math.floor((item.completedLength / item.filesize) * 100)}%;
-            background-color: {$storageCache.progressColor || '#faf'}"
+            background-color: {$storageCache.progressColor || '#ffaaff'}"
           ></div>
         </div>
       </div>

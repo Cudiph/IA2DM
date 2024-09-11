@@ -31,6 +31,8 @@ export let storageCache = writable({
   progressOutlineColor: '#999',
 });
 
+export let searchQuery = writable('');
+
 // ============ IPC  =============
 
 /** @type {RPCConfig} */
