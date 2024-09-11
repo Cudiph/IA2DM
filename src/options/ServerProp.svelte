@@ -148,6 +148,7 @@
 
     if (!res.result?.selected) return;
     quickTableForTextInput.dir = res.result.selected;
+    handleInputQuickOptions('dir');
   }
 
   const TITLE_HOSTNAME = 'Value can hostname/IP Address/Domain name';
