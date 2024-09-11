@@ -84,7 +84,7 @@
 
   function openDetailPage() {
     $selectedItem = item;
-    goto('/item-detail');
+    goto(`/item-detail?gid=${item.gid}`);
   }
 
   async function onHover() {

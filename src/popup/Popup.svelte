@@ -3,7 +3,7 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { route, cfg, aria2WS, selectedItem, searchQuery } from './store';
+  import { activeDownloadList, route, cfg, aria2WS, selectedItem, searchQuery } from './store';
   import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDirnameBasename, getFolderName, fuzzyFind } from '../lib/util';
@@ -14,7 +14,6 @@
   let intervalID = null;
 
   let filteredDownloadList = [];
-  let activeDownloadList = [];
   let dlHistory = [];
   let lastError = '';
   browser.storage.local.get(['dlHistory', 'lastError']).then((res) => {
@@ -123,7 +122,7 @@
       browser.runtime.sendMessage({ type: 'poke' });
     }
 
-    activeDownloadList = [...newActiveDownloads];
+    $activeDownloadList = [...newActiveDownloads];
   }
 
   function clearError() {
@@ -190,7 +189,7 @@
   {:else if $route.path === '/add'}
     <Add />
   {:else if $route.path === '/item-detail'}
-    <DownloadDetail />
+    <DownloadDetail {dlHistory} />
   {:else if $route.path === '/search' && $searchQuery.trim()}
     <Header />
     <main>
@@ -215,7 +214,7 @@
       {#if !has_required_optional_perms}
         <h2>Additional Permission Required.</h2>
       {:else}
-        {#each activeDownloadList as item (item.gid)}
+        {#each $activeDownloadList as item (item.gid)}
           <div class="item" in:slide out:scale>
             <DownloadItem {item} />
           </div>
@@ -225,7 +224,7 @@
             <DownloadItem {item} />
           </div>
         {/each}
-        {#if !activeDownloadList.length && !dlHistory.length}
+        {#if !$activeDownloadList.length && !dlHistory.length}
           <div class="notif">
             <p>Nobody here but us chickens!</p>
           </div>

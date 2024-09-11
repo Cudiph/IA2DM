@@ -26,8 +26,8 @@ export let selectedItem = writable({
   url: '',
   icon: '',
   dirname: '/',
-  basename: '#0',
-  status: 'waiting',
+  basename: 'GID not found',
+  status: 'error',
 });
 
 export let storageCache = writable({
@@ -36,6 +36,8 @@ export let storageCache = writable({
 });
 
 export let searchQuery = writable('');
+
+export let activeDownloadList = writable([]);
 
 // ============ IPC  =============
 

@@ -1,5 +1,5 @@
 <script>
-  import { selectedItem } from './store';
+  import { selectedItem, activeDownloadList, route } from './store';
   import { getIntegrationPass, integrationWS } from '../lib/store';
   import { goto } from '../lib/routing';
   import { getDefaultIcon } from '../lib/graphics';
@@ -7,6 +7,7 @@
   import { Aria2Tray } from '../lib/aria2tray';
   import { onDestroy } from 'svelte';
 
+  export let dlHistory = [];
   const a2t = new Aria2Tray(getIntegrationPass());
 
   let fileState = {
@@ -50,6 +51,25 @@
     initInfo();
   });
 
+  function getByGID(gid) {
+    for (const item of $activeDownloadList) {
+      if (item.gid === gid) return item;
+    }
+
+    for (const item of dlHistory) {
+      if (item.gid === gid) return item;
+    }
+  }
+
+  function fetchGID() {
+    if ($selectedItem.gid !== '0') return;
+
+    const gid = $route.urlParams.get('gid');
+    const found = getByGID(gid);
+    if (found) $selectedItem = found;
+  }
+
+  fetchGID();
   initInfo();
   onDestroy(iWSunsub);
   onDestroy(() => {
@@ -58,8 +78,8 @@
       url: '',
       icon: '',
       dirname: '/',
-      basename: '#0',
-      status: 'waiting',
+      basename: 'GID not found',
+      status: 'error',
     };
   });
 </script>
