@@ -83,7 +83,7 @@ you can open and delete file/folder right in the download history see [screensho
 
 </details>
 
-## Known issues
+## Tips
 
 - If you got `socket error` when using aria2 cli in Windows try adding
   `--disable-ipv6` flag.
