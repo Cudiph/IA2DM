@@ -2,6 +2,7 @@
   import browser from 'webextension-polyfill';
   import { getAria2OOP } from '../lib/aria2rpc';
   import { cookiesStringify, wsRpcFetch, semverCmp } from '../lib/util';
+  import { goto } from '../lib/routing';
   import { aria2WS, cfg } from './store';
   import { integrationWS, integrationVersion, getIntegrationPass } from '../lib/store';
   import { Aria2Tray } from '../lib/aria2tray';
@@ -48,7 +49,7 @@
         }
         success = true;
         setTimeout(() => {
-          location.hash = '#main';
+          goto('/main');
         }, 1000);
       } catch (e) {
         error = e;
@@ -88,7 +89,7 @@
       };
       browser.storage.session.set({ activeDownload });
       setTimeout(() => {
-        location.hash = '#main';
+        goto('/main');
       }, 1000);
     } catch (e) {
       error = e;
@@ -154,12 +155,12 @@
     </div>
     <div class="bottom-buttons">
       <button on:click={addNewDownloadHandler}>Add {ext}</button>
-      <button on:click={(_) => (location.hash = '#main')}>Cancel</button>
+      <button on:click={(_) => goto('/main')}>Cancel</button>
     </div>
   {:else}
     <div class="center">
       <h1>Not connected to any aria2 instance</h1>
-      <button on:click={() => (location.hash = '#main')}>OK</button>
+      <button on:click={() => goto('/main')}>OK</button>
     </div>
   {/if}
 </div>

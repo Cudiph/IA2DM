@@ -9,7 +9,8 @@
   import settingsIcon from '../assets/cog-outline.svg';
   import dockIcon from '../assets/dock-window.svg';
   import browser from 'webextension-polyfill';
-  import { aria2WS, cfg, page, searchQuery } from './store';
+  import { aria2WS, cfg, route, searchQuery } from './store';
+  import { goto } from '../lib/routing';
   import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
 
@@ -36,10 +37,10 @@
 
   function handleSearchClick() {
     $searchQuery = '';
-    if ($page !== '#search') {
-      location.hash = '#search';
+    if ($route.path !== '/search') {
+      goto('/search');
     } else {
-      location.hash = '#main';
+      goto('/main');
     }
   }
 
@@ -69,7 +70,7 @@
 
 <header>
   <div class="dl-action flex">
-    <button on:click={() => (location.hash = '#add')} title={ADD_TITLE}>
+    <button on:click={() => goto('/add')} title={ADD_TITLE}>
       <img class="img-icon" src={addIcon} alt="Add new download" />
     </button>
     <div class="separator"></div>
@@ -85,7 +86,7 @@
   </div>
   <div class="flex">
     <div class="indicator-container">
-      {#if $page === '#search'}
+      {#if $route.path === '/search'}
         <!-- svelte-ignore: a11y-autofocus -->
         <input type="text" bind:value={$searchQuery} autofocus placeholder={SEARCH_TITLE} />
       {:else}
@@ -112,9 +113,9 @@
   <div class="misc-action flex">
     <button
       on:click={handleSearchClick}
-      title={$page === '#search' ? SEARCH_CLOSE_TITLE : SEARCH_TITLE}
+      title={$route.path === '/search' ? SEARCH_CLOSE_TITLE : SEARCH_TITLE}
     >
-      <img class="img-icon" src={$page === '#search' ? xIcon : searchIcon} alt="Search" />
+      <img class="img-icon" src={$route.path === '/search' ? xIcon : searchIcon} alt="Search" />
     </button>
     <button on:click={handleDetachClick} title={DETACH_TITLE}>
       <img class="img-icon" src={dockIcon} alt="Detach" />

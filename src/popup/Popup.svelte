@@ -3,7 +3,7 @@
   import DownloadItem from './DownloadItem.svelte';
   import Add from './Add.svelte';
   import browser from 'webextension-polyfill';
-  import { page, cfg, aria2WS, selectedItem, searchQuery } from './store';
+  import { route, cfg, aria2WS, selectedItem, searchQuery } from './store';
   import { integrationWS } from '../lib/store';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDirnameBasename, getFolderName, fuzzyFind } from '../lib/util';
@@ -187,11 +187,11 @@
       </p>
       <button on:click={clearError}>OK</button>
     </div>
-  {:else if $page === '#add'}
+  {:else if $route.path === '/add'}
     <Add />
-  {:else if $page === '#item-detail'}
+  {:else if $route.path === '/item-detail'}
     <DownloadDetail />
-  {:else if $page === '#search' && $searchQuery.trim()}
+  {:else if $route.path === '/search' && $searchQuery.trim()}
     <Header />
     <main>
       {#if !has_required_optional_perms}

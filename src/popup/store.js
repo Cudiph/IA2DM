@@ -1,13 +1,16 @@
 import { readable, writable } from 'svelte/store';
 import browser from 'webextension-polyfill';
 import { check_connection } from '../lib/util';
+import { parseHashURL } from '../lib/routing';
 
 // ============== UI ==================
 
-/** @type {page} */
-export let page = readable(window.location.hash, (set) => {
+/** @type {route} */
+export let route = readable(parseHashURL(), (set) => {
   function hashChangeHandler() {
-    set(window.location.hash);
+    const pageStruct = parseHashURL();
+
+    set(pageStruct);
   }
 
   window.addEventListener('hashchange', hashChangeHandler);
@@ -16,6 +19,7 @@ export let page = readable(window.location.hash, (set) => {
     window.removeEventListener('hashchange', hashChangeHandler);
   };
 });
+
 /** @type {import("svelte/store").Writable<DownloadItem>} */
 export let selectedItem = writable({
   gid: '0',

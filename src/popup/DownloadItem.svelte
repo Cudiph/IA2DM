@@ -7,6 +7,7 @@
   import folderIcon from '../assets/folder-outline.svg';
   import { cfg, selectedItem, storageCache, aria2WS } from './store';
   import { getIntegrationPass, integrationWS } from '../lib/store';
+  import { goto } from '../lib/routing';
   import { getAria2JSON } from '../lib/aria2rpc';
   import { getDefaultIcon } from '../lib/graphics';
   import {
@@ -83,7 +84,7 @@
 
   function openDetailPage() {
     $selectedItem = item;
-    location.hash = '#item-detail';
+    goto('/item-detail');
   }
 
   async function onHover() {

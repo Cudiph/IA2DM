@@ -113,4 +113,10 @@ interface runtimeMSG {
   type: 'poke';
 }
 
-type page = Writable<'add' | 'item-detail' | 'main'>;
+interface routeStruct {
+  path: string;
+  urlParams: URLSearchParams;
+}
+
+type route = Readable<routeStruct>;
+

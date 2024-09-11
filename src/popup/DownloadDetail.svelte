@@ -1,14 +1,9 @@
 <script>
   import { selectedItem } from './store';
   import { getIntegrationPass, integrationWS } from '../lib/store';
+  import { goto } from '../lib/routing';
   import { getDefaultIcon } from '../lib/graphics';
-  import {
-    bestBytesString,
-    bestTimeString,
-    capitalize,
-    wsRpcFetch,
-    getDirnameBasename,
-  } from '../lib/util';
+  import { bestBytesString, bestTimeString, capitalize, wsRpcFetch } from '../lib/util';
   import { Aria2Tray } from '../lib/aria2tray';
   import { onDestroy } from 'svelte';
 
@@ -57,6 +52,16 @@
 
   initInfo();
   onDestroy(iWSunsub);
+  onDestroy(() => {
+    $selectedItem = {
+      gid: '0',
+      url: '',
+      icon: '',
+      dirname: '/',
+      basename: '#0',
+      status: 'waiting',
+    };
+  });
 </script>
 
 <div class="container">
@@ -165,7 +170,7 @@
     </tr>
   </table>
 
-  <button on:click={() => (location.hash = '#main')}>Done</button>
+  <button on:click={() => goto('/main')}>Done</button>
 </div>
 
 <style>
