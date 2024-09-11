@@ -33,6 +33,12 @@ browser.runtime.onInstalled.addListener(async ({ reason }) => {
 
 // intercept start here
 browser.downloads.onCreated.addListener(async (item) => {
+  // data only available in browser therefore can't be fetched outside the browser
+  const urlBlacklist = ['data:', 'blob:'];
+  for (const blacklisted of urlBlacklist) {
+    if (item.url.startsWith(blacklisted)) return;
+  }
+
   const {
     intercept,
     sendCookies,
